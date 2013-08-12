@@ -183,17 +183,21 @@ void
 RemoteGDB::getregs()
 {
 	// X0~X23
-	for(int i = 0; i != LILY2_NS::Num_X_Regs; i++) {
+	for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
 		gdbregs.regs[i]=context->getCpuPtr()->read_x_reg(i);
+		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
 	}
+	gdbregs.regs[24]=10086;//pc
+    gdbregs.regs[25]=10010;//RA
 	// Y
 	//for(int i = 0; i != LILY2_NS::Num_Y_Regs; i++) {
 	//	tc->getCpuPtr()->get_y_regfile()->read(i);
 	//}
-	// G
+	// G0~G8
 	//for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
-	//	tc->getCpuPtr()->get_g_regfile()->read();
-	//}
+	//	gdbregs.regs[12+i]=context->getCpuPtr()->read_g_reg(i);
+//gdbregs.regs[12+i]=pack(context->getCpuPtr()->read_g_reg(i*2),context->getCpuPtr()->read_g_reg(i*2+1));
+//	}
 	// PC
 	//tc->getCpuPtr()->get_pcs()->get_fetch_addr();
 	/*
@@ -244,8 +248,14 @@ RemoteGDB::setregs()
     // MIPS registers are 32 bits wide, gdb registers are 64 bits wide
     // two MIPS registers are packed into one gdb register (little endian)
 
+	for(int i=0;i < 24; i++){
+		context->setIntReg(i, 2);		
+			
+	}
+
+
     // INTREG: R0~R31
-    for (int i = 0; i < GdbIntArchRegs; i++) {
+    /*for (int i = 0; i < GdbIntArchRegs; i++) {
         if (i) context->setIntReg(i * 2,
                 unpackLo(gdbregs.regs[i]));
         context->setIntReg(i * 2 + 1,
@@ -276,6 +286,7 @@ RemoteGDB::setregs()
                 unpackLo(gdbregs.regs[GdbIntRegs + GdbFloatArchRegs + 0]));
     context->setFloatRegBits(FLOATREG_FIR,
                 unpackHi(gdbregs.regs[GdbIntRegs + GdbFloatArchRegs + 0]));
+	*/
 }
 
 void

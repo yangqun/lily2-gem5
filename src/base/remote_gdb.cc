@@ -364,6 +364,7 @@ BaseRemoteGDB::send(const char *bp)
 {
     const char *p;
     uint8_t csum, c;
+    int count=0;
 
     DPRINTF(GDBSend, "send:  %s\n", bp);
 
@@ -371,16 +372,24 @@ BaseRemoteGDB::send(const char *bp)
         p = bp;
         //Start sending a packet
         putbyte(GDBStart);
+		std::cout<<"Sending packet to GDB"<<GDBStart;
         //Send the contents, and also keep a check sum.
         for (csum = 0; (c = *p); p++) {
             putbyte(c);
+			std::cout<<c;
             csum += c;
+			count++;
+
         }
         //Send the ending character.
         putbyte(GDBEnd);
+		std::cout<<GDBEnd;
         //Sent the checksum.
         putbyte(i2digit(csum >> 4));
+		std::cout<<(i2digit(csum>>4));
         putbyte(i2digit(csum));
+		std::cout<<(i2digit(csum))<<std::endl;
+		std::cout<<"Gem5 sent "<<count<<" bits regs data to GDB"<<std::endl;
         //Try transmitting over and over again until the other end doesn't send an
         //error back.
     } while ((c = getbyte() & 0x7f) == GDBBadP);
@@ -391,7 +400,8 @@ int
 BaseRemoteGDB::recv(char *bp, int maxlen)
 {
     char *p;
-    int c, csum;
+    //int c, csum;
+	char c, csum;
     int len;
 
     do {
@@ -403,12 +413,18 @@ BaseRemoteGDB::recv(char *bp, int maxlen)
 
         //Read until you find the end of the data in the packet, and keep
         //track of the check sum.
+		std::cout << "Recving packet from GDB:$";
         while ((c = getbyte()) != GDBEnd && len < maxlen) {
+			std::cout << c;
             c &= 0x7f;
             csum += c;
             *p++ = c;
             len++;
         }
+		//std::cout << std::endl;
+	    std::cout<<"#"<<(i2digit(csum>>4));
+		std::cout<<(i2digit(csum))<<std::endl;
+
 
         //Mask the check sum, and terminate the command string.
         csum &= 0xff;

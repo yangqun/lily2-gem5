@@ -38,7 +38,7 @@
 #ifndef __ARCH_LILY2_REMOTE_GDB_HH__
 #define __ARCH_LILY2_REMOTE_GDB_HH__
 
-#include "arch/lily2/registers.hh"
+//#include "arch/lily2/registers.hh"
 #include "base/bitfield.hh"
 #include "base/remote_gdb.hh"
 
@@ -50,7 +50,7 @@ namespace Lily2ISA
 
     // The number of special regs depends on gdb.
     // Two 32-bit regs are packed into one 64-bit reg.
-    const int GdbIntArchRegs = NumIntArchRegs / 2;
+    /*const int GdbIntArchRegs = NumIntArchRegs / 2;
     const int GdbIntSpecialRegs = 6 / 2;
     const int GdbFloatArchRegs = NumFloatArchRegs / 2;
     const int GdbFloatSpecialRegs = 2 / 2;
@@ -58,7 +58,8 @@ namespace Lily2ISA
     const int GdbIntRegs = GdbIntArchRegs + GdbIntSpecialRegs;
     const int GdbFloatRegs = GdbFloatArchRegs + GdbFloatSpecialRegs;
     const int GdbNumRegs = GdbIntRegs + GdbFloatRegs;
-
+    */
+	const int GdbNumRegs = 26;
     class RemoteGDB : public BaseRemoteGDB
     {
       protected:
