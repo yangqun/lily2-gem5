@@ -422,6 +422,31 @@ class BaseCPU : public MemObject
 		return val;
 	}
 
+	virtual void write_x_reg(int i, LILY2_NS::WORD val)
+	{
+		;
+	}
+
+	virtual void write_y_reg(int i, LILY2_NS::QWORD val)
+	{
+		;
+	}
+
+	virtual void write_g_reg(int i, LILY2_NS::QWORD val)
+	{
+		;
+	}
+
+	virtual Addr read_pc(void)
+	{
+		return 0;
+	}
+
+	virtual void set_pc(Addr addr)
+	{
+		;
+	}
+
   public:
     // Number of CPU cycles simulated
     Stats::Scalar numCycles;
