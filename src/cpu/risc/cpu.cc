@@ -466,7 +466,7 @@ RiscCPU::tick()
 
     for (int i = 0; i < width || locked; ++i) {
 		DPF("\n\n\n");
-		DPF("Cycle = %lld\n", __cycle);
+		DPF("Cycle = %ld\n", __cycle);
 		
 		switch(__state) {
 			case INITIAL: {
@@ -495,7 +495,7 @@ RiscCPU::tick()
 				do {
 					/* Fetch. */
 					Addr addr = __pc_state->get_fetch_addr();
-					printf("PC Address: 0x%08llx\n", addr);
+					printf("PC Address: 0x%08lx\n", addr);
 					if(addr==0x10000d0) { printf("Enter the dead loop\n"); exit(0); }
 					ExtMachInst mach_inst = __fetch->fetch_inst();
 					

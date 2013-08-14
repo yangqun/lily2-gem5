@@ -54,6 +54,7 @@
 #include "base/my_base/my_macro.hh"
 #include "arch/lily2/lily2_traits/includes.hh"
 #include "resources/reg_file.hh"
+#include "resources/pc_state.hh"
 
 /* Forward declaration. */
 namespace LILY2_NS
@@ -318,6 +319,31 @@ public:
 	virtual QWORD read_g_reg(int i)
 	{
 		return __g_regfile->read(i);
+	}
+
+	virtual void write_x_reg(int i, WORD val)
+	{
+		__x_regfile->write(i, val);
+	}
+
+	virtual void write_y_reg(int i, QWORD val)
+	{
+		__y_regfile->write(i, val);
+	}
+
+	virtual void write_g_reg(int i, QWORD val)
+	{
+		__g_regfile->write(i, val);
+	}
+
+	virtual Addr read_pc(void)
+	{
+		return __pc_state->get_fetch_addr();
+	}
+
+	virtual void set_pc(Addr addr)
+	{
+		__pc_state->set_fetch_addr(addr);
 	}
     
 public:
