@@ -59,7 +59,7 @@ namespace Lily2ISA
     const int GdbFloatRegs = GdbFloatArchRegs + GdbFloatSpecialRegs;
     const int GdbNumRegs = GdbIntRegs + GdbFloatRegs;
     */
-	const int GdbNumRegs = 26;
+	const int GdbNumRegs = 24 + 8 + 2;
     class RemoteGDB : public BaseRemoteGDB
     {
       protected:

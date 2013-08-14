@@ -135,7 +135,7 @@ class BaseRemoteGDB
   protected:
     class GdbRegCache
     {
-      public:
+      public:                                  //uint64_t
         GdbRegCache(size_t newSize) : regs(new uint64_t[newSize]), size(newSize)
         {}
         ~GdbRegCache()
@@ -143,8 +143,9 @@ class BaseRemoteGDB
             delete [] regs;
         }
 
-        uint64_t * regs;
-        size_t size;
+        //uint64_t * regs;
+		uint64_t * regs;
+        size_t size;                          //uint64_t
         size_t bytes() { return size * sizeof(uint64_t); }
     };
 

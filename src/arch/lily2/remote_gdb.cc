@@ -142,6 +142,7 @@
 
 #include <string>
 
+#include <iostream>
 #include "arch/lily2/decoder.hh"
 #include "arch/lily2/remote_gdb.hh"
 #include "arch/lily2/vtophys.hh"
@@ -187,8 +188,11 @@ RemoteGDB::getregs()
 		gdbregs.regs[i]=context->getCpuPtr()->read_x_reg(i);
 		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
 	}
-	gdbregs.regs[24]=10086;//pc
-    gdbregs.regs[25]=10010;//RA
+    for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
+		gdbregs.regs[24+i]=context->getCpuPtr()->read_g_reg(i)._h0;// & 0xffffffff;//just get G regs' low 32bit data
+    }
+	gdbregs.regs[32]=context->pcState().pc();//10086;//pc
+    gdbregs.regs[33]=10010;//RA
 	// Y
 	//for(int i = 0; i != LILY2_NS::Num_Y_Regs; i++) {
 	//	tc->getCpuPtr()->get_y_regfile()->read(i);
