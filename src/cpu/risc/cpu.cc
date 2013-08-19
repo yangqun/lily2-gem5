@@ -457,6 +457,7 @@ RiscCPU::writeMem(uint8_t *data, unsigned size,
 void
 RiscCPU::tick()
 {
+	checkPcEventQueue();
     DPRINTF(SimpleCPU, "Tick\n");
 
     Tick latency = 0;
@@ -465,9 +466,11 @@ RiscCPU::tick()
         __pc_state->init((thread->pcState()).instAddr());
 
     for (int i = 0; i < width || locked; ++i) {
-		DPF("\n\n\n");
-		DPF("Cycle = %ld\n", __cycle);
-		
+		thread->setInstAddr(__pc_state->get_fetch_addr());
+		std::cout << "Hello World: " << thread->instAddr() << std::endl;
+		DPF("\n\n");
+		//DPF("Cycle = %ld\n", __cycle);
+		std::cout<<"Cycle = "<<std::dec<<__cycle<<std::endl;
 		switch(__state) {
 			case INITIAL: {
 				__cycle += Initial_Cycle;
@@ -495,7 +498,8 @@ RiscCPU::tick()
 				do {
 					/* Fetch. */
 					Addr addr = __pc_state->get_fetch_addr();
-					printf("PC Address: 0x%08lx\n", addr);
+					//printf("PC Address: 0x%08lx\n", addr);
+					std::cout<<"PC Address: 0x" << std::hex << addr << std::endl;
 					if(addr==0x10000d0) { printf("Enter the dead loop\n"); exit(0); }
 					ExtMachInst mach_inst = __fetch->fetch_inst();
 					

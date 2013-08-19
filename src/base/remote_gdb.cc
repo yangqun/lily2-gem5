@@ -137,6 +137,8 @@
 #include "sim/full_system.hh"
 #include "sim/system.hh"
 
+#include "cpu/thread_state.hh"
+#include "arch/lily2/lily2_traits/register.hh"
 using namespace std;
 using namespace Debug;
 using namespace TheISA;
@@ -251,7 +253,7 @@ BaseRemoteGDB::Event::process(int revent)
         gdb->detach();
 }
 
-BaseRemoteGDB::BaseRemoteGDB(System *_system, ThreadContext *c, size_t cacheSize)
+BaseRemoteGDB::BaseRemoteGDB(System *_system, ThreadContext *c, LILY2_NS::WORD cacheSize)
     : event(NULL), listener(NULL), number(-1), fd(-1),
       active(false), attached(false),
       system(_system), context(c),
@@ -464,10 +466,10 @@ BaseRemoteGDB::recv(char *bp, int maxlen)
 
 // Read bytes from kernel address space for debugger.
 bool
-BaseRemoteGDB::read(Addr vaddr, size_t size, char *data)
+BaseRemoteGDB::read(Addr vaddr, LILY2_NS::WORD size, char *data)
 {
     static Addr lastaddr = 0;
-    static size_t lastsize = 0;
+    static LILY2_NS::WORD lastsize = 0;
 
     if (vaddr < 10) {
       DPRINTF(GDBRead, "read:  reading memory location zero!\n");
@@ -500,10 +502,10 @@ BaseRemoteGDB::read(Addr vaddr, size_t size, char *data)
 
 // Write bytes to kernel address space for debugger.
 bool
-BaseRemoteGDB::write(Addr vaddr, size_t size, const char *data)
+BaseRemoteGDB::write(Addr vaddr, LILY2_NS::WORD size, const char *data)
 {
     static Addr lastaddr = 0;
-    static size_t lastsize = 0;
+    static LILY2_NS::WORD lastsize = 0;
 
     if (vaddr < 10) {
       DPRINTF(GDBWrite, "write: writing memory location zero!\n");
@@ -552,7 +554,7 @@ BaseRemoteGDB::HardBreakpoint::process(ThreadContext *tc)
 }
 
 bool
-BaseRemoteGDB::insertSoftBreak(Addr addr, size_t len)
+BaseRemoteGDB::insertSoftBreak(Addr addr, LILY2_NS::WORD len)
 {
     if (len != sizeof(TheISA::MachInst))
         panic("invalid length\n");
@@ -561,7 +563,7 @@ BaseRemoteGDB::insertSoftBreak(Addr addr, size_t len)
 }
 
 bool
-BaseRemoteGDB::removeSoftBreak(Addr addr, size_t len)
+BaseRemoteGDB::removeSoftBreak(Addr addr, LILY2_NS::WORD len)
 {
     if (len != sizeof(MachInst))
         panic("invalid length\n");
@@ -570,7 +572,7 @@ BaseRemoteGDB::removeSoftBreak(Addr addr, size_t len)
 }
 
 bool
-BaseRemoteGDB::insertHardBreak(Addr addr, size_t len)
+BaseRemoteGDB::insertHardBreak(Addr addr, LILY2_NS::WORD len)
 {
     if (len != sizeof(MachInst))
         panic("invalid length\n");
@@ -582,12 +584,12 @@ BaseRemoteGDB::insertHardBreak(Addr addr, size_t len)
         bkpt = new HardBreakpoint(this, addr);
 
     bkpt->refcount++;
-
+    printf("inserting breakpoint\n");   
     return true;
 }
 
 bool
-BaseRemoteGDB::removeHardBreak(Addr addr, size_t len)
+BaseRemoteGDB::removeHardBreak(Addr addr, LILY2_NS::WORD len)
 {
     if (len != sizeof(MachInst))
         panic("invalid length\n");
@@ -644,10 +646,10 @@ bool
 BaseRemoteGDB::trap(int type)
 {
     uint64_t val;
-    size_t datalen, len;
+    LILY2_NS::WORD datalen, len;
     char data[GDBPacketBufLen + 1];
     char *buffer;
-    size_t bufferSize;
+    LILY2_NS::WORD bufferSize;
     const char *p;
     char command, subcmd;
     string var;
@@ -757,7 +759,7 @@ BaseRemoteGDB::trap(int type)
                 continue;
             }
 
-            if (read(val, (size_t)len, (char *)buffer)) {
+            if (read(val, (LILY2_NS::WORD)len, (char *)buffer)) {
                // variable length array would be nice, but C++ doesn't
                // officially support those...
                char *temp = new char[2*len+1];
@@ -793,7 +795,7 @@ BaseRemoteGDB::trap(int type)
                 send("E0A");
                 continue;
             }
-            if (write(val, (size_t)len, (char *)buffer))
+            if (write(val, (LILY2_NS::WORD)len, (char *)buffer))
               send("OK");
             else
               send("E0B");
@@ -927,6 +929,8 @@ BaseRemoteGDB::trap(int type)
           case GDBCycleStep:
           case GDBSigCycleStep:
           case GDBReadReg:
+            send("100086");
+			continue;
           case GDBSetVar:
           case GDBReset:
           case GDBThreadAlive:

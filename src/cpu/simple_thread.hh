@@ -316,6 +316,12 @@ class SimpleThread : public ThreadState
         return _pcState.instAddr();
     }
 
+	void
+	setInstAddr(Addr pc)
+	{
+		_pcState.set(pc);
+	}
+
     Addr
     nextInstAddr()
     {

@@ -40,6 +40,8 @@
 #include "base/socket.hh"
 #include "cpu/pc_event.hh"
 
+#include "arch/lily2/lily2_traits/type.hh"
+
 class System;
 class ThreadContext;
 
@@ -91,6 +93,7 @@ class BaseRemoteGDB
 
     //Helper functions
   protected:
+    uint32_t readreg(int idx);
     int digit2i(char);
     char i2digit(int);
     Addr hex2i(const char **);
@@ -136,7 +139,7 @@ class BaseRemoteGDB
     class GdbRegCache
     {
       public:                                  //uint64_t
-        GdbRegCache(size_t newSize) : regs(new uint64_t[newSize]), size(newSize)
+        GdbRegCache(LILY2_NS::WORD newSize) : regs(new uint32_t[newSize]), size(newSize)
         {}
         ~GdbRegCache()
         {
@@ -144,9 +147,9 @@ class BaseRemoteGDB
         }
 
         //uint64_t * regs;
-		uint64_t * regs;
-        size_t size;                          //uint64_t
-        size_t bytes() { return size * sizeof(uint64_t); }
+		uint32_t * regs;
+        LILY2_NS::WORD size;                          //uint64_t
+        LILY2_NS::WORD bytes() { return size * sizeof(uint32_t); }
     };
 
     GdbRegCache gdbregs;
@@ -160,14 +163,14 @@ class BaseRemoteGDB
 
   protected:
     // Machine memory
-    virtual bool read(Addr addr, size_t size, char *data);
-    virtual bool write(Addr addr, size_t size, const char *data);
+    virtual bool read(Addr addr, LILY2_NS::WORD size, char *data);
+    virtual bool write(Addr addr, LILY2_NS::WORD size, const char *data);
 
     template <class T> T read(Addr addr);
     template <class T> void write(Addr addr, T data);
 
   public:
-    BaseRemoteGDB(System *system, ThreadContext *context, size_t cacheSize);
+    BaseRemoteGDB(System *system, ThreadContext *context, LILY2_NS::WORD cacheSize);
     virtual ~BaseRemoteGDB();
 
     void replaceThreadContext(ThreadContext *tc) { context = tc; }
@@ -176,8 +179,8 @@ class BaseRemoteGDB
     void detach();
     bool isattached();
 
-    virtual bool acc(Addr addr, size_t len) = 0;
-    bool trap(int type);
+    virtual bool acc(Addr addr, LILY2_NS::WORD len) = 0;
+    virtual bool trap(int type);
     virtual bool breakpoint()
     {
         return trap(SIGTRAP);
@@ -213,10 +216,10 @@ class BaseRemoteGDB
     typedef break_map_t::iterator break_iter_t;
     break_map_t hardBreakMap;
 
-    bool insertSoftBreak(Addr addr, size_t len);
-    bool removeSoftBreak(Addr addr, size_t len);
-    virtual bool insertHardBreak(Addr addr, size_t len);
-    bool removeHardBreak(Addr addr, size_t len);
+    bool insertSoftBreak(Addr addr, LILY2_NS::WORD len);
+    bool removeSoftBreak(Addr addr, LILY2_NS::WORD len);
+    virtual bool insertHardBreak(Addr addr, LILY2_NS::WORD len);
+    bool removeHardBreak(Addr addr, LILY2_NS::WORD len);
 
   protected:
     void clearTempBreakpoint(Addr &bkpt);
