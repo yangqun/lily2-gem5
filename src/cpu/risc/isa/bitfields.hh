@@ -62,12 +62,16 @@ namespace LILY2_NS {
  
 #undef  CST5_A
 #define CST5_A   bits(_mach_inst, 18, 14)
- 
+
+#undef  SCST16
+#define SCST16   bits(_mach_inst, 20, 5)
+
 #undef  MODE
 #define MODE     bits(_mach_inst, 22, 19)
  
 #undef  Z
 #define Z        bits(_mach_inst, 3, 3)
+
 #undef  CREG
 #define CREG     bits(_mach_inst, 2, 0)
  

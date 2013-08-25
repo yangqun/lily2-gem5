@@ -136,6 +136,96 @@ public:
    std::string generate_disassembly(void) const; 
 };
 	
+/* *********************************************************************
+ * *************************** MOVQ_D **********************************
+ * ********************************************************************/
+class MOVQ_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    MOVQ_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** MOVQF_D **********************************
+ * ********************************************************************/
+class MOVQF_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    MOVQF_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** MOVFQ_D **********************************
+ * ********************************************************************/
+class MOVFQ_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    MOVFQ_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
 } // namespace LILY2_NS
 
 #endif // __RISC_ISA_CATEGORIES_MOVE_HH__

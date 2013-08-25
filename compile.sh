@@ -1,1 +1,1 @@
-scons build/LILY2/gem5.opt CPU_MODELS=RiscCPU
+scons build/LILY2/gem5.debug  CPU_MODELS=RiscCPU

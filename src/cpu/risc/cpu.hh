@@ -173,6 +173,7 @@ public:
     typedef LILY2_NS::QWORD QWORD;
     typedef LILY2_NS::SP SP;
     typedef LILY2_NS::DP DP;
+    typedef LILY2_NS::QSP QSP;
     typedef LILY2_NS::StaticInst StaticInst;
     typedef LILY2_NS::StaticInst::StaticInstPtr StaticInstPtr;
     typedef LILY2_NS::PCState PCState;
@@ -246,7 +247,7 @@ public:
      */
     LILY2_NS::PCState *get_pcs(void) { return __pc_state; }  
     LILY2_NS::Fetch *get_fetch(void) { return __fetch; }
-
+	
 	int get_num_res(Resource *res);
 	
 	/**
@@ -283,7 +284,7 @@ public:
     QWORD read_src_qw_operand(const StaticInst *s_ptr, int idx);
     SP read_src_sp_operand(const StaticInst *s_ptr, int idx);
     DP read_src_dp_operand(const StaticInst *s_ptr, int idx);
-    
+    QSP read_src_qsp_operand(const StaticInst *s_ptr, int idx);
     /**
      * Results caching interfaces.
      */
@@ -292,10 +293,15 @@ public:
     void cache_dst_qw_operand(const StaticInst *s_ptr, int idx, QWORD val);
     void cache_dst_sp_operand(const StaticInst *s_ptr, int idx, SP val);
     void cache_dst_dp_operand(const StaticInst *s_ptr, int idx, DP val);
-    
+    void cache_dst_qsp_operand(const StaticInst *s_ptr, int idx, QSP val);
+
     void cache_dst_w_hi_operand(const StaticInst *s_ptr, int idx, WORD val);
     void cache_dst_w_lo_operand(const StaticInst *s_ptr, int idx, WORD val);
-    
+    void cache_dst_qw_h0_operand(const StaticInst *s_ptr, int idx, WORD val);
+    void cache_dst_qw_h1_operand(const StaticInst *s_ptr, int idx, WORD val);
+    void cache_dst_qw_h2_operand(const StaticInst *s_ptr, int idx, WORD val);
+    void cache_dst_qw_h3_operand(const StaticInst *s_ptr, int idx, WORD val);
+
     /**
      * Condition register interfaces.
      */

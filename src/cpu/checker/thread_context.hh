@@ -203,6 +203,16 @@ class CheckerThreadContext : public ThreadContext
         checkerTC->clearArchRegs();
     }
 
+	int getCPI()
+	{
+		return actualTC->getCPI(); 
+	}
+
+	void setCPI(int cpi)
+	{
+		actualTC->setCPI(cpi);
+	}
+
     //
     // New accessors for new decoder.
     //

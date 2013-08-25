@@ -128,6 +128,8 @@ class SimpleThread : public ThreadState
     TheISA::TLB *itb;
     TheISA::TLB *dtb;
 
+	int _cpi;
+
     TheISA::Decoder decoder;
 
     // constructor: initialize SimpleThread from given process structure
@@ -327,6 +329,19 @@ class SimpleThread : public ThreadState
     {
         return _pcState.nextInstAddr();
     }
+
+	int
+	getCPI(void)
+	{
+		return _cpi;
+	}
+
+	void
+	setCPI(int cpi)
+	{
+		_cpi = cpi;
+	}
+
 
     MicroPC
     microPC()

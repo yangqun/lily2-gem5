@@ -466,6 +466,186 @@ public:
 };
 
 /* *********************************************************************
+ * ************************* LDD_NO_OFFSET_D ***************************
+ * ********************************************************************/
+class LDD_NO_OFFSET_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDD_NO_OFFSET_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** LDD_D ***********************************
+ * ********************************************************************/
+class LDD_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDD_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** LDDI_D ***********************************
+ * ********************************************************************/
+class LDDI_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDDI_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * ************************* LDQ_NO_OFFSET_D ***************************
+ * ********************************************************************/
+class LDQ_NO_OFFSET_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDQ_NO_OFFSET_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** LDQ_D ***********************************
+ * ********************************************************************/
+class LDQ_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDQ_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** LDQI_D ***********************************
+ * ********************************************************************/
+class LDQI_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    LDQI_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
  * ************************* STB_NO_OFFSET_D ***************************
  * ********************************************************************/
 class STB_NO_OFFSET_D : public StaticInst
@@ -718,6 +898,186 @@ public:
      * @param (mach_inst) : Machine code of instruction.
      */
     STWI_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+	
+/* *********************************************************************
+ * ************************* STD_NO_OFFSET_D ***************************
+ * ********************************************************************/
+class STD_NO_OFFSET_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STD_NO_OFFSET_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** STD_D ***********************************
+ * ********************************************************************/
+class STD_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STD_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** STDI_D ***********************************
+ * ********************************************************************/
+class STDI_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STDI_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * ************************* STQ_NO_OFFSET_D ***************************
+ * ********************************************************************/
+class STQ_NO_OFFSET_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STQ_NO_OFFSET_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** STQ_D ***********************************
+ * ********************************************************************/
+class STQ_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STQ_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** STQI_D ***********************************
+ * ********************************************************************/
+class STQI_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    STQI_D(ExtMachInst mach_inst);
     
     /**
      * Pure virtual function.

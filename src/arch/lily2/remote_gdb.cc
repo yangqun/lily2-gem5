@@ -234,7 +234,7 @@ RemoteGDB::trap(int type)
         command = data[0];
         subcmd = 0;
         p = data + 1;
-		std::cout << "packet is: " << data[1] <<data[2]<<std::endl;
+		//std::cout << "packet is: " << data[1] <<data[2]<<std::endl;
         switch (command) {
           case GDBSignal:
             // if this command came from a running gdb, answer it --
@@ -245,7 +245,7 @@ RemoteGDB::trap(int type)
             send(buffer);
             continue;
 
-          case GDBRegR:
+          case GDBRegR:  //'g'
             if (2 * gdbregs.bytes() > bufferSize)
                 panic("buffer too small");
 
@@ -253,7 +253,7 @@ RemoteGDB::trap(int type)
             send(buffer);
             continue;
 
-          case GDBRegW:
+          case GDBRegW:   //'G'
             p = hex2mem(gdbregs.regs, p, gdbregs.bytes());
             if (p == NULL || *p != '\0')
                 send("E01");
@@ -282,7 +282,7 @@ RemoteGDB::trap(int type)
             continue;
 #endif
 
-          case GDBMemR:
+          case GDBMemR:  //'m' read memory
             val = hex2i(&p);
             if (*p++ != ',') {
                 send("E02");
@@ -353,8 +353,8 @@ RemoteGDB::trap(int type)
                 send("E01");
             continue;
 
-          case GDBDetach:
-          case GDBKill:
+          case GDBDetach:  //D
+          case GDBKill:    //k
             active = false;
             clearSingleStep();
             detach();
@@ -377,7 +377,7 @@ RemoteGDB::trap(int type)
             clearSingleStep();
             goto out;
 
-          case GDBAsyncStep:
+          case GDBAsyncStep:   //'C'
             subcmd = hex2i(&p);
             if (*p++ == ';') {
                 val = hex2i(&p);
@@ -441,12 +441,10 @@ RemoteGDB::trap(int type)
             switch (subcmd) {
               case '0': // software breakpoint
                 ret = insertSoftBreak(val, len);
-				printf("HELLO,bktsoft\n");
                 break;
 
               case '1': // hardware breakpoint
                 ret = insertHardBreak(val, len);
-				printf("HELLO,bkthard");
                 break;
 
               case '2': // write watchpoint
@@ -650,6 +648,7 @@ RemoteGDB::clearSingleStep()
 
     if (notTakenBkpt != 0)
         clearTempBreakpoint(notTakenBkpt);
+	printf("clearSingleStep function was called\n");
 }
 
 void
@@ -674,11 +673,17 @@ RemoteGDB::setSingleStep()
             takenBkpt, notTakenBkpt);
 
     notTakenBkpt = pc.nnpc();
-    setTempBreakpoint(notTakenBkpt);
-
+	std::cout << "Single old= 0x" << std::hex << context->instAddr() << std::endl;
+	std::cout << "Single CPI = " << std::dec << context->getCPI() << std::endl;
+	std::cout << "Single bp = 0x" << std::hex << context->instAddr() +context->getCPI() *4 << std::endl;
+	//std::cout << "pc = " <<std::hex << context->instAddr() + context->getCPI() * 4 << std::endl;
+	setTempBreakpoint(context->instAddr() + 4);
+	//setTempBreakpoint(notTakenBkpt);
+    //setTempBreakpoint(notTakenBkpt);
+	/*
     if (set_bt) {
         takenBkpt = bpc.npc();
         setTempBreakpoint(takenBkpt);
-    }
+    }*/
 }
 

@@ -119,7 +119,7 @@ RiscCPU::RiscCPU(RiscCPUParams *p)
       __pc_state(new PCState(this)), 
       __fetch(new Fetch(this)),
       __decode(new Decode(this)),
-      __dispatch(new Dispatch(this, 1, 2)),
+      __dispatch(new Dispatch(this, 1, 1)),
       __xa_exec(new Execute(this,1,1)), 
       __xm_exec(new Execute(this,1,1)), 
       __xd_exec(new Execute(this,1,1)),
@@ -464,12 +464,13 @@ RiscCPU::tick()
     
     if(!__pc_state->is_init()) 
         __pc_state->init((thread->pcState()).instAddr());
+	
+	
+	//checkPcEventQueue();
 
     for (int i = 0; i < width || locked; ++i) {
-		thread->setInstAddr(__pc_state->get_fetch_addr());
-		std::cout << "Hello World: " << thread->instAddr() << std::endl;
-		DPF("\n\n");
-		//DPF("Cycle = %ld\n", __cycle);
+		//thread->setInstAddr(__pc_state->get_fetch_addr());
+		//std::cout << "(FUCK) PC ADDRESS: 0x" << std::hex << thread->instAddr() << std::endl;
 		std::cout<<"Cycle = "<<std::dec<<__cycle<<std::endl;
 		switch(__state) {
 			case INITIAL: {
@@ -498,9 +499,7 @@ RiscCPU::tick()
 				do {
 					/* Fetch. */
 					Addr addr = __pc_state->get_fetch_addr();
-					//printf("PC Address: 0x%08lx\n", addr);
-					std::cout<<"PC Address: 0x" << std::hex << addr << std::endl;
-					if(addr==0x10000d0) { printf("Enter the dead loop\n"); exit(0); }
+					if(addr==0x100008c) { printf("Enter the dead loop\n"); exit(0); }
 					ExtMachInst mach_inst = __fetch->fetch_inst();
 					
 					/* Decode. */
@@ -550,6 +549,8 @@ RiscCPU::tick()
 		__cycle++;
 		__x_regfile->__DEBUG();
 		__g_regfile->__DEBUG();
+
+thread->setInstAddr(__pc_state->get_fetch_addr());
 		
         //numCycles++;
 
@@ -751,9 +752,34 @@ RiscCPU::read_src_qw_operand(const StaticInst *s_ptr, int idx)
 	    && reg_idx<LILY2_NS::C_Base_DepTag);
 	
 	if(reg_idx<LILY2_NS::G_Base_DepTag)
-	    return __y_regfile->read(reg_idx-LILY2_NS::X_Base_DepTag);
+	    return __y_regfile->read(reg_idx-LILY2_NS::Y_Base_DepTag);
 	else
 	    return __g_regfile->read(reg_idx-LILY2_NS::G_Base_DepTag); 
+}
+
+RiscCPU::QSP
+RiscCPU::read_src_qsp_operand(const StaticInst *s_ptr, int idx)
+{
+	RegIndex reg_idx = s_ptr->get_src_reg_idx(idx);
+	
+	QWORD reg_val;
+	QSP treg_val;
+
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag)
+	    reg_val = __y_regfile->read(reg_idx-LILY2_NS::Y_Base_DepTag);
+	else
+	    reg_val = __g_regfile->read(reg_idx-LILY2_NS::G_Base_DepTag); 
+
+	treg_val._h0 = *reinterpret_cast<SP *>(&reg_val._h0);
+	treg_val._h1 = *reinterpret_cast<SP *>(&reg_val._h1);
+	treg_val._h2 = *reinterpret_cast<SP *>(&reg_val._h2);
+	treg_val._h3 = *reinterpret_cast<SP *>(&reg_val._h3);
+
+	return treg_val;
 }
 
 RiscCPU::SP
@@ -862,6 +888,102 @@ RiscCPU::cache_dst_qw_operand(const StaticInst *s_ptr, int idx, QWORD reg_val)
 	        reg_val, delay_slot);
 	else
 	    __g_regfile->cache(reg_idx-LILY2_NS::G_Base_DepTag, \
+	        reg_val, delay_slot);
+}
+
+void
+RiscCPU::cache_dst_qsp_operand(const StaticInst *s_ptr, int idx, QSP reg_val)
+{
+	RegIndex reg_idx = s_ptr->get_dst_reg_idx(idx);
+	Tick delay_slot = s_ptr->get_dyn_inst()->get_dyn_delay_slot(idx);
+	
+	QWORD treg_val;
+	treg_val._h0 = *reinterpret_cast<WORD *>(&reg_val._h0);
+	treg_val._h1 = *reinterpret_cast<WORD *>(&reg_val._h1);
+	treg_val._h2 = *reinterpret_cast<WORD *>(&reg_val._h2);
+	treg_val._h3 = *reinterpret_cast<WORD *>(&reg_val._h3);
+
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag) 
+	    __y_regfile->cache(reg_idx-LILY2_NS::Y_Base_DepTag, \
+	        treg_val, delay_slot);
+	else
+	    __g_regfile->cache(reg_idx-LILY2_NS::G_Base_DepTag, \
+	        treg_val, delay_slot);
+}
+
+void
+RiscCPU::cache_dst_qw_h0_operand(const StaticInst *s_ptr, int idx, WORD reg_val)
+{
+	RegIndex reg_idx = s_ptr->get_dst_reg_idx(idx);
+	Tick delay_slot = s_ptr->get_dyn_inst()->get_dyn_delay_slot(idx);
+	
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag) 
+	    __y_regfile->cache_h0(reg_idx-LILY2_NS::Y_Base_DepTag, \
+	        reg_val, delay_slot);
+	else
+	    __g_regfile->cache_h0(reg_idx-LILY2_NS::G_Base_DepTag, \
+	        reg_val, delay_slot);
+}
+
+void
+RiscCPU::cache_dst_qw_h1_operand(const StaticInst *s_ptr, int idx, WORD reg_val)
+{
+	RegIndex reg_idx = s_ptr->get_dst_reg_idx(idx);
+	Tick delay_slot = s_ptr->get_dyn_inst()->get_dyn_delay_slot(idx);
+	
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag) 
+	    __y_regfile->cache_h1(reg_idx-LILY2_NS::Y_Base_DepTag, \
+	        reg_val, delay_slot);
+	else
+	    __g_regfile->cache_h1(reg_idx-LILY2_NS::G_Base_DepTag, \
+	        reg_val, delay_slot);
+}
+
+void
+RiscCPU::cache_dst_qw_h2_operand(const StaticInst *s_ptr, int idx, WORD reg_val)
+{
+	RegIndex reg_idx = s_ptr->get_dst_reg_idx(idx);
+	Tick delay_slot = s_ptr->get_dyn_inst()->get_dyn_delay_slot(idx);
+	
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag) 
+	    __y_regfile->cache_h2(reg_idx-LILY2_NS::Y_Base_DepTag, \
+	        reg_val, delay_slot);
+	else
+	    __g_regfile->cache_h2(reg_idx-LILY2_NS::G_Base_DepTag, \
+	        reg_val, delay_slot);
+}
+
+void
+RiscCPU::cache_dst_qw_h3_operand(const StaticInst *s_ptr, int idx, WORD reg_val)
+{
+	RegIndex reg_idx = s_ptr->get_dst_reg_idx(idx);
+	Tick delay_slot = s_ptr->get_dyn_inst()->get_dyn_delay_slot(idx);
+	
+	/* Could be Y,G. */
+	ERR(reg_idx>=LILY2_NS::Y_Base_DepTag \
+	    && reg_idx<LILY2_NS::C_Base_DepTag);
+	
+	if(reg_idx<LILY2_NS::G_Base_DepTag) 
+	    __y_regfile->cache_h3(reg_idx-LILY2_NS::Y_Base_DepTag, \
+	        reg_val, delay_slot);
+	else
+	    __g_regfile->cache_h3(reg_idx-LILY2_NS::G_Base_DepTag, \
 	        reg_val, delay_slot);
 }
 

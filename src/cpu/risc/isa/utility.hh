@@ -49,7 +49,7 @@ template <class T>
 inline
 T abs(T op)
 {
-	return op>0 ? op : -op;
+	return op>=0 ? op : -op;
 }
 
 template <class T>
@@ -313,7 +313,7 @@ inline
 T
 nmac(T op_1, T op_2, T op_3)
 {
-	return ~(op_1*op_2+op_3);
+	return -(op_1*op_2+op_3);
 }
 
 
@@ -337,7 +337,7 @@ inline
 T
 nmsu(T op_1, T op_2, T op_3)
 {
-	return ~(op_1*op_2-op_3);
+	return -(op_1*op_2-op_3);
 }
 
 
@@ -388,7 +388,7 @@ exp(T op_1, int op_2)
 {
   int select_bit = bits(op_2, 4, 0);
   float e = 2.71828;
-  T val;
+  T val = 0;
   switch(select_bit)
   {
     case 0x4: {
@@ -419,7 +419,7 @@ log(T op_1, int op_2)
 {
   int select_bit = bits(op_2, 4, 0);
   float e = 2.71828;
-  T val;
+  T val = 0;
   switch(select_bit)
   {
     case 0x4: {
@@ -584,7 +584,120 @@ flt_to_doub(float op)
   val = op;
   return val;
 }
+
+/**
+ * vector abs
+ * added by shenyuanyi
+ */
+inline
+QWORD
+absv(QWORD op_0)
+{
+	QWORD val;
+	if (op_0._h0 > 0)
+		{
+			val._h0 = op_0._h0;
+		}
+	else if (op_0._h0 < 0)
+		{
+			val._h0 = -op_0._h0;
+		}
+	else val._h0 = op_0._h0;
 	
+	if (op_0._h1 > 0)
+		{
+			val._h1 = op_0._h1;
+		}
+	else if (op_0._h1 < 0)
+		{
+			val._h1 = -op_0._h1;
+		}
+	else val._h1 = op_0._h1;
+
+	if (op_0._h2 > 0)
+		{
+			val._h2 = op_0._h2;
+		}
+	else if (op_0._h2 < 0)
+		{
+			val._h2 = -op_0._h2;
+		}
+	else val._h2 = op_0._h2;
+
+	if (op_0._h3 > 0)
+		{
+			val._h3 = op_0._h3;
+		}
+	else if (op_0._h3 < 0)
+		{
+			val._h3 = -op_0._h3;
+		}
+	else val._h3 = op_0._h3;
+
+	return val;
+}
+
+/**
+ * vector neg  
+ * added by shenyuanyi
+ */
+inline
+QWORD
+negv(QWORD op_0)
+{
+	QWORD val;
+	val._h0 = -op_0._h0;
+	val._h1 = -op_0._h1;
+	val._h2 = -op_0._h2;
+	val._h3 = -op_0._h3;
+	return val;
+}
+
+/**
+ * select 32 bits from 128bit number using const
+ * added by shenyuanyi
+ */
+inline
+WORD
+QFselect(QWORD op_0, int _imm)
+{
+	WORD val;
+	switch (_imm){
+		case 0: 
+			val = op_0._h0;
+			break;
+		case 1:
+			val = op_0._h1;
+			break;
+		case 2: 
+			val = op_0._h2;			
+			break;
+		case 3:
+			val = op_0._h3;
+			break;
+		default: 
+			val = 0; 
+			break;
+	}
+	return val;
+}
+
+/**
+ * vector sqrt
+ * added by shenyuanyi
+ */
+inline
+QSP
+qsqrt(QSP op_0)
+{
+	QSP val;
+	val._h0 = sqrt(op_0._h0);
+	val._h1 = sqrt(op_0._h1);
+	val._h2 = sqrt(op_0._h2);
+	val._h3 = sqrt(op_0._h3);
+	return val;
+}
+
 } // namespace LILY2_NS
 
 #endif // __RISC_ISA_UTILITY_HH__

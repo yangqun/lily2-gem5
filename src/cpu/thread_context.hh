@@ -194,6 +194,9 @@ class ThreadContext
 
     virtual void clearArchRegs() = 0;
 
+	virtual int getCPI(void) = 0;
+	virtual void setCPI(int) = 0;
+
     //
     // New accessors for new decoder.
     //
@@ -391,6 +394,9 @@ class ProxyThreadContext : public ThreadContext
     Addr instAddr() { return actualTC->instAddr(); }
     Addr nextInstAddr() { return actualTC->nextInstAddr(); }
     MicroPC microPC() { return actualTC->microPC(); }
+
+	int getCPI(void) { return actualTC->getCPI(); }
+	void setCPI(int cpi) { return actualTC->setCPI(cpi); }
 
     bool readPredicate() { return actualTC->readPredicate(); }
 

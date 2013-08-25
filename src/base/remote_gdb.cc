@@ -374,7 +374,7 @@ BaseRemoteGDB::send(const char *bp)
         p = bp;
         //Start sending a packet
         putbyte(GDBStart);
-		std::cout<<"Sending packet to GDB"<<GDBStart;
+		std::cout<<"Sending packet to GDB: "<<GDBStart;
         //Send the contents, and also keep a check sum.
         for (csum = 0; (c = *p); p++) {
             putbyte(c);
@@ -391,7 +391,7 @@ BaseRemoteGDB::send(const char *bp)
 		std::cout<<(i2digit(csum>>4));
         putbyte(i2digit(csum));
 		std::cout<<(i2digit(csum))<<std::endl;
-		std::cout<<"Gem5 sent "<<count<<" bits regs data to GDB"<<std::endl;
+		std::cout<<"Gem5 sent "<<count/8<<" Bytes regs data to GDB"<<std::endl;
         //Try transmitting over and over again until the other end doesn't send an
         //error back.
     } while ((c = getbyte() & 0x7f) == GDBBadP);
@@ -415,7 +415,7 @@ BaseRemoteGDB::recv(char *bp, int maxlen)
 
         //Read until you find the end of the data in the packet, and keep
         //track of the check sum.
-		std::cout << "Recving packet from GDB:$";
+		std::cout << "Recving packet from GDB: $";
         while ((c = getbyte()) != GDBEnd && len < maxlen) {
 			std::cout << c;
             c &= 0x7f;
@@ -584,8 +584,9 @@ BaseRemoteGDB::insertHardBreak(Addr addr, LILY2_NS::WORD len)
         bkpt = new HardBreakpoint(this, addr);
 
     bkpt->refcount++;
-    printf("inserting breakpoint\n");   
-    return true;
+    //printf("inserting breakpoint at address: 0x%x\n",addr);   
+    std::cout<<"(FUCK)Breakpoint inserted: 0x"<<std::hex<<addr<<std::endl;
+	return true;
 }
 
 bool
@@ -605,7 +606,7 @@ BaseRemoteGDB::removeHardBreak(Addr addr, LILY2_NS::WORD len)
         delete hbp;
         hardBreakMap.erase(i);
     }
-
+    printf("Removing breakpoint\n");
     return true;
 }
 

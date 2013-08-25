@@ -22,5 +22,7 @@
 #include "move.hh"
 #include "multiply.hh"
 #include "shift.hh"
+#include "fp.hh"
+#include "vector.hh"
 
 #endif // __RISC_ISA_CATEGORIES_INCLUDES_HH__
