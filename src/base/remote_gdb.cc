@@ -989,13 +989,13 @@ BaseRemoteGDB::mem2hex(void *vdst, const void *vsrc, int len)
 {
     char *dst = (char *)vdst;
     const char *src = (const char *)vsrc;
-
+    printf("len is :%d\n",len);
     while (len--) {
         *dst++ = i2digit(*src >> 4);
         *dst++ = i2digit(*src++);
     }
     *dst = '\0';
-}
+	}
 
 // Convert an hex string into a byte array.
 // This returns a pointer to the character following the last valid

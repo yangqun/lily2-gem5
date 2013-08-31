@@ -305,10 +305,22 @@ RemoteGDB::trap(int type)
             if (read(val, (LILY2_NS::WORD)len, (char *)buffer)) {
                // variable length array would be nice, but C++ doesn't
                // officially support those...
-               char *temp = new char[2*len+1];
-               mem2hex(temp, buffer, len);
-               send(temp);
-               delete [] temp;
+               //char *temp = new char[2*len+1];
+			   //mem2hex(temp, buffer, len);
+				char *dst1 = new char[2*4+1]; ;//= (char *)vdst;
+    			char *src1 = (char *)buffer;
+				*(dst1+4) = i2digit(*src1 >> 4);
+				*(dst1+5) = i2digit(*src1);
+				*(dst1+6) = i2digit(*(src1+1) >> 4);
+				*(dst1+7) = i2digit(*(src1+1));
+				*(dst1+0) = i2digit(*(src1+2) >> 4);
+				*(dst1+1) = i2digit(*(src1+2));
+				*(dst1+2) = i2digit(*(src1+3) >> 4);
+				*(dst1+3) = i2digit(*(src1+3));
+    			*(dst1+8) = '\0';
+               send(dst1);
+               //delete [] temp;
+			   delete [] dst1;
             } else {
                send("E05");
             }
@@ -360,10 +372,12 @@ RemoteGDB::trap(int type)
             detach();
             goto out;
 
-          case GDBAsyncCont:
+          case GDBAsyncCont://C04#a7
             subcmd = hex2i(&p);
+            printf("GDBAsyncCont subcmd is:%d\n",subcmd);
             if (*p++ == ';') {
                 val = hex2i(&p);
+				printf("GDBAsyncCont address is: %x\n",val);
                 context->pcState(val);
             }
             clearSingleStep();
@@ -377,10 +391,12 @@ RemoteGDB::trap(int type)
             clearSingleStep();
             goto out;
 
-          case GDBAsyncStep:   //'C'
+          case GDBAsyncStep:   //S04#b7  si
             subcmd = hex2i(&p);
+			printf("GDBAsyncStep subcmd is:%d\n",subcmd);
             if (*p++ == ';') {
                 val = hex2i(&p);
+				printf("GDBAsyncStep address is: %x\n",val);
                 context->pcState(val);
             }
             setSingleStep();
