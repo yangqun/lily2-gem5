@@ -282,7 +282,30 @@ class DelaySlotPCState : public SimplePCState<MachInst>
 
     Addr _nnpc;
 
+	int _branch_taken;
+	Addr _branch_target;
+
   public:
+
+    void setBranchTaken(int branch_taken)
+	{
+		_branch_taken = branch_taken;
+	}
+
+	int getBranchTaken(void)
+	{
+		return _branch_taken;
+	}
+
+	void setBranchTarget(Addr addr)
+	{
+		_branch_target = addr;
+	}
+
+	Addr getBranchTarget(void)
+	{
+		return _branch_target;
+	}
 
     Addr nnpc() const { return _nnpc; }
     void nnpc(Addr val) { _nnpc = val; }
@@ -294,8 +317,8 @@ class DelaySlotPCState : public SimplePCState<MachInst>
         nnpc(val + 2 * sizeof(MachInst));
     }
 
-    DelaySlotPCState() {}
-    DelaySlotPCState(Addr val) { set(val); }
+    DelaySlotPCState() { _branch_taken = false; }
+    DelaySlotPCState(Addr val) { set(val); _branch_taken = false; }
 
     bool
     branching() const

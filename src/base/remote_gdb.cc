@@ -391,7 +391,8 @@ BaseRemoteGDB::send(const char *bp)
 		std::cout<<(i2digit(csum>>4));
         putbyte(i2digit(csum));
 		std::cout<<(i2digit(csum))<<std::endl;
-		std::cout<<"Gem5 sent "<<count/8<<" Bytes regs data to GDB"<<std::endl;
+		//std::cout<<"Gem5 sent "<<count/8<<" Bytes regs data to GDB"<<std::endl;
+
         //Try transmitting over and over again until the other end doesn't send an
         //error back.
     } while ((c = getbyte() & 0x7f) == GDBBadP);
@@ -989,13 +990,12 @@ BaseRemoteGDB::mem2hex(void *vdst, const void *vsrc, int len)
 {
     char *dst = (char *)vdst;
     const char *src = (const char *)vsrc;
-    printf("len is :%d\n",len);
-    while (len--) {
-        *dst++ = i2digit(*src >> 4);
-        *dst++ = i2digit(*src++);
-    }
-    *dst = '\0';
-	}
+    	while (len--) {
+        	*dst++ = i2digit(*src >> 4);
+        	*dst++ = i2digit(*src++);
+    	}
+    	*dst = '\0';
+}
 
 // Convert an hex string into a byte array.
 // This returns a pointer to the character following the last valid

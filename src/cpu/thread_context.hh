@@ -218,6 +218,10 @@ class ThreadContext
 
     virtual void pcStateNoRecord(const TheISA::PCState &val) = 0;
 
+	virtual int getBranchTaken() = 0;
+
+	virtual Addr getBranchTarget() = 0;
+
     virtual Addr instAddr() = 0;
 
     virtual Addr nextInstAddr() = 0;
@@ -390,6 +394,9 @@ class ProxyThreadContext : public ThreadContext
     void pcState(const TheISA::PCState &val) { actualTC->pcState(val); }
 
     void pcStateNoRecord(const TheISA::PCState &val) { actualTC->pcState(val); }
+
+	int getBranchTaken() { return actualTC->getBranchTaken(); }
+	Addr getBranchTarget() { return actualTC->getBranchTarget(); }
 
     Addr instAddr() { return actualTC->instAddr(); }
     Addr nextInstAddr() { return actualTC->nextInstAddr(); }

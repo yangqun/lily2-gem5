@@ -312,6 +312,30 @@ class SimpleThread : public ThreadState
         _pcState = val;
     }
 
+	int
+	getBranchTaken()
+	{
+		return _pcState.getBranchTaken();
+	}
+
+	void
+	setBranchTaken(int branchTaken)
+	{
+		_pcState.setBranchTaken(branchTaken);
+	}
+
+	Addr
+	getBranchTarget()
+	{
+		return _pcState.getBranchTarget();
+	}
+
+	void
+	setBranchTarget(Addr branchTarget)
+	{
+		_pcState.setBranchTarget(branchTarget);
+	}
+
     Addr
     instAddr()
     {

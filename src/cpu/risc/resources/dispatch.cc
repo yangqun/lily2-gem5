@@ -44,18 +44,19 @@ Dispatch::dispatch_inst(const StaticInst *s_ptr)
 		if(!__FLAG) printf("3\n");
 		table.mem_ref++;
 	}
+	/*
 	if(!is_parallel_issue_width(s_ptr)) {
 		__FLAG = false;
 		if(!__FLAG) printf("4\n");
 		table.issue_width++;
-	}
+	}*/
 	
 	/* After dispatch statistics. */
 	if(__FLAG) {
 		statistics_reg_dep(s_ptr);
 		statistics_branch(s_ptr);
 		statistics_mem_ref(s_ptr);
-		statistics_issue_width(s_ptr);
+		//statistics_issue_width(s_ptr);
 	}
 	
 	return __FLAG;
@@ -104,8 +105,9 @@ bool
 Dispatch::is_parallel_issue_width(const StaticInst *s_ptr)
 {
 	/* Issue width resource restriction. */
-	if(!_cpu->no_res(this, 0)) return true;
-    else return false;
+	//if(!_cpu->no_res(this, 0)) return true;
+    //else return false;
+	return true;
 }
 
 void

@@ -213,6 +213,16 @@ class CheckerThreadContext : public ThreadContext
 		actualTC->setCPI(cpi);
 	}
 
+	int getBranchTaken(void)
+	{
+		return actualTC->getBranchTaken();
+	}
+
+	Addr getBranchTarget(void)
+	{
+		return actualTC->getBranchTarget();
+	}
+
     //
     // New accessors for new decoder.
     //

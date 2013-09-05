@@ -457,6 +457,9 @@ RiscCPU::writeMem(uint8_t *data, unsigned size,
 void
 RiscCPU::tick()
 {
+	std::cout << std::endl << std::endl << std::endl;
+	std::cout << "A New Cycle" << std::endl;
+
 	checkPcEventQueue();
     DPRINTF(SimpleCPU, "Tick\n");
 
@@ -464,9 +467,6 @@ RiscCPU::tick()
     
     if(!__pc_state->is_init()) 
         __pc_state->init((thread->pcState()).instAddr());
-	
-	
-	//checkPcEventQueue();
 
     for (int i = 0; i < width || locked; ++i) {
 		//thread->setInstAddr(__pc_state->get_fetch_addr());
@@ -476,6 +476,7 @@ RiscCPU::tick()
 			case INITIAL: {
 				__cycle += Initial_Cycle;
 				__state = RUNNING;
+				commit();
 				break;
 			}
 			
@@ -483,6 +484,7 @@ RiscCPU::tick()
 				FOR(i,0,Bubbles_Cycle) commit();
 				__cycle += Bubbles_Cycle;
 				__state = RUNNING;
+				commit();
 				break;
 			}
 			
@@ -490,13 +492,17 @@ RiscCPU::tick()
 				FOR(i,0,Modecut_Cycle) commit();
 				__cycle += Modecut_Cycle;
 				__state = RUNNING;
+				commit();
 				break;
 			}
+			default: break;
+
+		}
 			
-			case RUNNING: {
 				int count = 0;
 				bool keep_on;
-				do {
+				//do {
+					//thread->setBranchTaken(false);
 					/* Fetch. */
 					Addr addr = __pc_state->get_fetch_addr();
 					if(addr==0x100008c) { printf("Enter the dead loop\n"); exit(0); }
@@ -510,6 +516,7 @@ RiscCPU::tick()
 					
 					/* Execute. */
 					if(keep_on) {
+						count++;
 						if(!(count++)) __pc_state->set_dpkt_addr(addr);
 						__pc_state->set_inst_addr(addr);
 						s_ptr->get_dyn_inst()->set_inst_addr(addr);
@@ -527,6 +534,8 @@ RiscCPU::tick()
 							if(s_ptr->get_dyn_inst()->is_branch()) {
 								addr = s_ptr->get_dyn_inst()->get_branch_target();
 								__state = BUBBLES;
+								thread->setBranchTaken(2);
+								thread->setBranchTarget(addr);
 							}
 						}
 						
@@ -534,23 +543,30 @@ RiscCPU::tick()
 					}
 					
 					delete s_ptr;
-				} while(keep_on);
-				
-				break;
-			}
-			
-			default: {
-				assert(0);
-			}
-		}
+				//} while(keep_on);
+
+				thread->setCPI(count);
 		
 		commit();
 		clr_res(__dispatch);
 		__cycle++;
 		__x_regfile->__DEBUG();
 		__g_regfile->__DEBUG();
+		
+		if(thread->getBranchTaken() == 1) {
+			std::cout << "Hello world" << std::endl;
+			thread->setInstAddr(thread->getBranchTarget() + 4);
+			thread->setBranchTaken(0);
+		}
+		else if(thread->getBranchTaken() == 2) {
+			thread->setBranchTaken(1);
+			thread->setInstAddr(thread->instAddr() + 4);
+		}
+		else {
+			thread->setInstAddr(thread->instAddr() + 4);
+		}
+		
 
-thread->setInstAddr(__pc_state->get_fetch_addr());
 		
         //numCycles++;
 

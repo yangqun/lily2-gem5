@@ -95,7 +95,7 @@ class BaseSimpleCPU : public BaseCPU
 
     inline void checkPcEventQueue() {
         Addr oldpc, pc = thread->instAddr();
-//		std::cout << "Fuck in base.hh: 0x" << std::hex << thread->instAddr() << std::endl;
+ 		std::cout << "Fuck in base.hh: 0x" << std::hex << thread->instAddr() << std::endl;
         do {
             oldpc = pc;
             system->pcEventQueue.service(tc);
