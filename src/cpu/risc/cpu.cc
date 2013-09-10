@@ -119,7 +119,7 @@ RiscCPU::RiscCPU(RiscCPUParams *p)
       __pc_state(new PCState(this)), 
       __fetch(new Fetch(this)),
       __decode(new Decode(this)),
-      __dispatch(new Dispatch(this, 1, 1)),
+      __dispatch(new Dispatch(this, 1, 2)),
       __xa_exec(new Execute(this,1,1)), 
       __xm_exec(new Execute(this,1,1)), 
       __xd_exec(new Execute(this,1,1)),
@@ -457,8 +457,8 @@ RiscCPU::writeMem(uint8_t *data, unsigned size,
 void
 RiscCPU::tick()
 {
-	std::cout << std::endl << std::endl << std::endl;
-	std::cout << "A New Cycle" << std::endl;
+	//std::cout << std::endl << std::endl << std::endl;
+	//std::cout << "A New Cycle" << std::endl;
 
 	checkPcEventQueue();
     DPRINTF(SimpleCPU, "Tick\n");
@@ -501,7 +501,7 @@ RiscCPU::tick()
 			
 				int count = 0;
 				bool keep_on;
-				//do {
+				do {
 					//thread->setBranchTaken(false);
 					/* Fetch. */
 					Addr addr = __pc_state->get_fetch_addr();
@@ -543,7 +543,7 @@ RiscCPU::tick()
 					}
 					
 					delete s_ptr;
-				//} while(keep_on);
+				} while(keep_on);
 
 				thread->setCPI(count);
 		
@@ -554,7 +554,7 @@ RiscCPU::tick()
 		__g_regfile->__DEBUG();
 		
 		if(thread->getBranchTaken() == 1) {
-			std::cout << "Hello world" << std::endl;
+			//std::cout << "Hello world" << std::endl;
 			thread->setInstAddr(thread->getBranchTarget() + 4);
 			thread->setBranchTaken(0);
 		}

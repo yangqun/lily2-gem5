@@ -649,12 +649,14 @@ RemoteGDB::clearSingleStep()
     DPRINTF(GDBMisc, "clearSingleStep bt_addr=%#x nt_addr=%#x\n",
             takenBkpt, notTakenBkpt);
 
-    if (takenBkpt != 0)
+	std::cout << "clearSingleStep"<<std::endl;
+	std::cout << "takenBkpt = 0x" << std::hex <<takenBkpt << std::endl;
+	std::cout << "nottakenBkpt = 0x" << std::hex << notTakenBkpt <<std::endl;
+	if (takenBkpt != 0)
         clearTempBreakpoint(takenBkpt);
 
     if (notTakenBkpt != 0)
         clearTempBreakpoint(notTakenBkpt);
-	printf("clearSingleStep function was called\n");
 }
 
 void
@@ -663,6 +665,7 @@ RemoteGDB::setSingleStep()
     PCState pc = context->pcState();
     PCState bpc;
     bool set_bt = false;
+	Addr tempbkpt[7];
 
     // User was stopped at pc, e.g. the instruction at pc was not
     // executed.
@@ -679,11 +682,26 @@ RemoteGDB::setSingleStep()
             takenBkpt, notTakenBkpt);
 
     notTakenBkpt = pc.nnpc();
+	cout << "pc = 0x"<< hex << context->instAddr() <<endl; 
+    //printf("pc = %#x\n",context->instAddr());
+	for(int i = 0;i < 2;i++)
+	{
+	  break_iter_t t = hardBreakMap.find(context->instAddr() + 4*i);
+	  if(t == hardBreakMap.end())
+	  {
+	    tempbkpt[i] = context->instAddr() + 4*i;
+	  }	
+	}
+
 	if(context->getBranchTaken() == 1) {
 		setTempBreakpoint(context->getBranchTarget() + 4);
 	}
 	else {
-		setTempBreakpoint(context->instAddr() + 4);
+		for(int j = 0;j < 2;j++)
+		{
+		  setTempBreakpoint(tempbkpt[j]);	
+		}
+		//setTempBreakpoint(context->instAddr() + 4);
 	}
 	//setTempBreakpoint(notTakenBkpt);
     //setTempBreakpoint(notTakenBkpt);

@@ -388,7 +388,7 @@ BaseRemoteGDB::send(const char *bp)
 		std::cout<<GDBEnd;
         //Sent the checksum.
         putbyte(i2digit(csum >> 4));
-		std::cout<<(i2digit(csum>>4));
+		std::cout<<(i2digit(csum >> 4));
         putbyte(i2digit(csum));
 		std::cout<<(i2digit(csum))<<std::endl;
 		//std::cout<<"Gem5 sent "<<count/8<<" Bytes regs data to GDB"<<std::endl;
@@ -424,7 +424,7 @@ BaseRemoteGDB::recv(char *bp, int maxlen)
             *p++ = c;
             len++;
         }
-		//std::cout << std::endl;
+//		std::cout << std::endl;
 	    std::cout<<"#"<<(i2digit(csum>>4));
 		std::cout<<(i2digit(csum))<<std::endl;
 
@@ -581,12 +581,13 @@ BaseRemoteGDB::insertHardBreak(Addr addr, LILY2_NS::WORD len)
     DPRINTF(GDBMisc, "inserting hardware breakpoint at %#x\n", addr);
 
     HardBreakpoint *&bkpt = hardBreakMap[addr];
+	//printf("bkpt = ");
     if (bkpt == 0)
         bkpt = new HardBreakpoint(this, addr);
 
     bkpt->refcount++;
-    //printf("inserting breakpoint at address: 0x%x\n",addr);   
-    std::cout<<"(FUCK)Breakpoint inserted: 0x"<<std::hex<<addr<<std::endl;
+    printf("bkpt->refcount = %d\n",bkpt->refcount);   
+    //std::cout<<"(FUCK)Breakpoint inserted: 0x"<<std::hex<<addr<<std::endl;
 	return true;
 }
 
