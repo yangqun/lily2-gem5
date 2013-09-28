@@ -114,6 +114,104 @@ CMPEQI_D::generate_disassembly() const
 }
 
 /* *********************************************************************
+ * *************************** CMPNEQ_D *********************************
+ * ********************************************************************/	
+CMPNEQ_D::CMPNEQ_D(ExtMachInst mach_inst)
+    : StaticInst("CMPNEQ", mach_inst)
+{
+	/* Flags. */
+	_flags[Is_32_Bit ]  = true;
+	_flags[Is_Cond   ]  = true;
+	
+	/* Unit. */
+	/* Parameters: A/M/D. */
+	init_unit(D);
+	
+	/* Immediate. */
+	/* Parameters: imm, imm_len. */
+	//init_imm(imm, imm_len);
+	
+	/* Registers. */
+	/* Parameters: num_src_regs, num_dst_regs, ... */
+	init_src_regs(2, REG, RS_1_A, REG, RS_2_A);
+	init_dst_regs(1, REG, RD_A, 0);
+}
+
+void
+CMPNEQ_D::execute(RiscCPU *cpu) const
+{
+	if(cond_execute(cpu)) {
+		/* Reading registers. */
+		WORD op_0 = cpu->read_src_w_operand(this, 0);
+		WORD op_1 = cpu->read_src_w_operand(this, 1);
+		
+		/* Execution. */
+		WORD final = cmpneq(op_0, op_1);
+		
+		/* Writing registers. */
+		cpu->cache_dst_w_operand(this, 0, final);
+	}
+	else {
+		_d_ptr->set_op2nop();
+	}
+}
+
+std::string
+CMPNEQ_D::generate_disassembly() const
+{
+	return print_inst();
+}
+
+/* *********************************************************************
+ * *************************** CMPNEQI_D ********************************
+ * ********************************************************************/	
+CMPNEQI_D::CMPNEQI_D(ExtMachInst mach_inst)
+    : StaticInst("CMPNEQ", mach_inst)
+{
+	/* Flags. */
+	_flags[Is_32_Bit ]  = true;
+	_flags[Is_Cond   ]  = true;
+	
+	/* Unit. */
+	/* Parameters: A/M/D. */
+	init_unit(D);
+	
+	/* Immediate. */
+	/* Parameters: imm, imm_len. */
+	init_imm(CST5_A, 5);
+	
+	/* Registers. */
+	/* Parameters: num_src_regs, num_dst_regs, ... */
+	init_src_regs(1, REG, RS_1_A);
+	init_dst_regs(1, REG, RD_A, 0);
+}
+
+void
+CMPNEQI_D::execute(RiscCPU *cpu) const
+{
+	if(cond_execute(cpu)) {
+		/* Reading registers. */
+		WORD op_0 = cpu->read_src_w_operand(this, 0);
+		WORD op_1 = _imm;
+		
+		/* Execution. */
+		WORD final = cmpneq(op_0, op_1);
+		
+		/* Writing registers. */
+		cpu->cache_dst_w_operand(this, 0, final);
+	}
+	else {
+		_d_ptr->set_op2nop();
+	}
+}
+
+std::string
+CMPNEQI_D::generate_disassembly() const
+{
+	return print_inst_imm();
+}
+
+/* *********************************************************************
  * *************************** CMPGT_D *********************************
  * ********************************************************************/	
 CMPGT_D::CMPGT_D(ExtMachInst mach_inst)

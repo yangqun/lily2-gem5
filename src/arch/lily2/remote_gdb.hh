@@ -59,16 +59,21 @@ namespace Lily2ISA
     const int GdbFloatRegs = GdbFloatArchRegs + GdbFloatSpecialRegs;
     const int GdbNumRegs = GdbIntRegs + GdbFloatRegs;
     */
-	const int GdbNumRegs = 24 + 8 + 1;
+	const int GdbNumRegs = 58;//X G Y PC
+	const int tempbkptNum = 12 ;//insert 12 temp breakpoints,for GDB si
+
     class RemoteGDB : public BaseRemoteGDB
     {
       protected:
         Addr notTakenBkpt;
         Addr takenBkpt;
-
+		Addr tempbkpt[12];//for GDB si
       public:
         RemoteGDB(System *_system, ThreadContext *tc);
 
+	  public:
+		void clearsi();
+		
       protected:
         bool acc(Addr addr, size_t len);
         

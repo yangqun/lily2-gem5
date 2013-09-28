@@ -29,7 +29,7 @@ const int C_Base_DepTag = G_Base_DepTag + Num_G_Regs;
 const int O_Base_DepTag = C_Base_DepTag + Num_C_Regs;
 
 const WORD Mask_1 = 0xffffffff;
-const WORD Mask_0 = 0xffffffff;
+const WORD Mask_0 = 0x00000000;
 const WORD Mask_hi = 0xffff0000;
 const WORD Mask_lo = 0x0000ffff;
 const QWORD Mask_h3h2h1h0 = { Mask_1, Mask_1, Mask_1, Mask_1 };

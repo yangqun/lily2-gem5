@@ -76,6 +76,66 @@ public:
 };
 
 /* *********************************************************************
+ * *************************** CMPNEQ_D *********************************
+ * ********************************************************************/
+class CMPNEQ_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    CMPNEQ_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
+ * *************************** CMPNEQI_D ********************************
+ * ********************************************************************/
+class CMPNEQI_D : public StaticInst
+{
+public:
+    /**
+     * Constructor.
+     * 
+     * @param (mnemonic)  : Mnemonic of instruction.
+     * @param (mach_inst) : Machine code of instruction.
+     */
+    CMPNEQI_D(ExtMachInst mach_inst);
+    
+    /**
+     * Pure virtual function.
+     * EXECUTE fucntions describe how an instruction is executed.
+     * 
+     * @param (cpu) : Pointer to cpu.
+     */
+    void execute(RiscCPU *cpu) const;
+    
+   /**
+    * Pure virtual function.
+    * 
+    * @return : Disassembly language of instruction.
+    */
+   std::string generate_disassembly(void) const; 
+};
+
+/* *********************************************************************
  * *************************** CMPGT_D *********************************
  * ********************************************************************/
 class CMPGT_D : public StaticInst

@@ -317,8 +317,8 @@ class DelaySlotPCState : public SimplePCState<MachInst>
         nnpc(val + 2 * sizeof(MachInst));
     }
 
-    DelaySlotPCState() { _branch_taken = false; }
-    DelaySlotPCState(Addr val) { set(val); _branch_taken = false; }
+    DelaySlotPCState() {}
+    DelaySlotPCState(Addr val) { set(val); }
 
     bool
     branching() const

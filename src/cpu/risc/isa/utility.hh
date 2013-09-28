@@ -145,6 +145,13 @@ T cmpeq(T op_0, T op_1)
 
 template <class T>
 inline
+T cmpneq(T op_0, T op_1)
+{
+    return op_0==op_1 ? 0 : 0xffffffff;	
+}
+
+template <class T>
+inline
 T cmpgt(T op_0, T op_1)
 {
 	return op_0>op_1 ? 0xffffffff : 0;
@@ -695,6 +702,50 @@ qsqrt(QSP op_0)
 	val._h1 = sqrt(op_0._h1);
 	val._h2 = sqrt(op_0._h2);
 	val._h3 = sqrt(op_0._h3);
+	return val;
+}
+
+inline
+QSP
+swap(QSP op_0)
+{
+	QSP val;
+	val._h0 = op_0._h1;
+	val._h1 = op_0._h0;
+	val._h2 = op_0._h3;
+	val._h3 = op_0._h2;
+	return val;
+}
+
+inline
+QSP
+packeven(QSP op_0)
+{
+	QSP val;
+	val._h0 = op_0._h0;
+	val._h1 = op_0._h2;
+	return val;
+}
+
+inline
+QSP
+packodd(QSP op_0)
+{
+	QSP val;
+	val._h0 = op_0._h1;
+	val._h1 = op_0._h3;
+	return val;
+}
+
+inline
+QSP
+int2SP(QWORD op_0)
+{
+	QSP val;
+	val._h0 = *reinterpret_cast<float*>(&op_0._h0);
+	val._h1 = *reinterpret_cast<float*>(&op_0._h1);
+	val._h2 = *reinterpret_cast<float*>(&op_0._h2);
+	val._h3 = *reinterpret_cast<float*>(&op_0._h3);
 	return val;
 }
 

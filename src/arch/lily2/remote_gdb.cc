@@ -185,18 +185,18 @@ RemoteGDB::acc(Addr va, size_t len)
 bool
 RemoteGDB::trap(int type)
 {
-    uint32_t val;
-    LILY2_NS::WORD datalen, len;
+    uint64_t val;
+    size_t datalen, len;
     char data[GDBPacketBufLen + 1];
     char *buffer;
-    LILY2_NS::WORD bufferSize;
+    size_t bufferSize;
     const char *p;
     char command, subcmd;
     string var;
     bool ret;
 
     int idx;
-    uint32_t * regval;
+    uint64_t * regval;
 
     if (!attached)
         return false;
@@ -207,6 +207,7 @@ RemoteGDB::trap(int type)
     DPRINTF(GDBMisc, "trap: PC=%s\n", context->pcState());
 
     clearSingleStep();
+	clearsi();
 
     /*
      * The first entry to this function is normally through
@@ -302,7 +303,7 @@ RemoteGDB::trap(int type)
                 continue;
             }
 
-            if (read(val, (LILY2_NS::WORD)len, (char *)buffer)) {
+            if (read(val, (size_t)len, (char *)buffer)) {
                // variable length array would be nice, but C++ doesn't
                // officially support those...
                char *temp = new char[2*len+1];
@@ -340,7 +341,7 @@ RemoteGDB::trap(int type)
                 send("E0A");
                 continue;
             }
-            if (write(val, (LILY2_NS::WORD)len, (char *)buffer))
+            if (write(val, (size_t)len, (char *)buffer))
               send("OK");
             else
               send("E0B");
@@ -364,10 +365,10 @@ RemoteGDB::trap(int type)
 
           case GDBAsyncCont://C04#a7
             subcmd = hex2i(&p);
-            printf("GDBAsyncCont subcmd is:%d\n",subcmd);
+            //printf("GDBAsyncCont subcmd is:%d\n",subcmd);
             if (*p++ == ';') {
                 val = hex2i(&p);
-				printf("GDBAsyncCont address is: %x\n",val);
+				//printf("GDBAsyncCont address is: %x\n",val);
                 context->pcState(val);
             }
             clearSingleStep();
@@ -386,7 +387,7 @@ RemoteGDB::trap(int type)
 			printf("GDBAsyncStep subcmd is:%d\n",subcmd);
             if (*p++ == ';') {
                 val = hex2i(&p);
-				printf("GDBAsyncStep address is: %x\n",val);
+				//printf("GDBAsyncStep address is: %x\n",val);
                 context->pcState(val);
             }
             setSingleStep();
@@ -438,7 +439,7 @@ RemoteGDB::trap(int type)
             val = hex2i(&p);
             if (*p++ != ',') send("E0D");
             len = hex2i(&p);
-            printf("Address is: %x, length is:%d\n",val,len);
+            //printf("Address is: %x, length is:%d\n",val,len);
             DPRINTF(GDBMisc, "set %s, addr=%#x, len=%d\n",
                     break_type(subcmd), val, len);
 
@@ -478,9 +479,9 @@ RemoteGDB::trap(int type)
           case GDBCycleStep:
           case GDBSigCycleStep:
           case GDBReadReg:
-		    //printf("GDBREADREG\n");
+		    printf("GDBREADREG\n");
 			idx=digit2i(data[1])*16 + digit2i(data[2]);
-			//printf("GDBREADREG idx is: %d\n",idx);
+			printf("GDBREADREG idx is: %d\n",idx);
             regval = &gdbregs.regs[idx];
             //send(regval);
 			mem2hex(buffer, regval, 4);
@@ -527,10 +528,19 @@ RemoteGDB::getregs()
 		gdbregs.regs[i]=context->getCpuPtr()->read_x_reg(i);
 		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
 	}
-    for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
-		gdbregs.regs[24+i]=context->getCpuPtr()->read_g_reg(i)._h0;// & 0xffffffff;//just get G regs' low 32bit data
+    /*for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
+		gdbregs.regs[24+4*i]  =context->getCpuPtr()->read_g_reg(i)._h3;
+		gdbregs.regs[24+1+4*i]=context->getCpuPtr()->read_g_reg(i)._h2;
+		gdbregs.regs[24+2+4*i]=context->getCpuPtr()->read_g_reg(i)._h1;
+		gdbregs.regs[24+3+4*i]=context->getCpuPtr()->read_g_reg(i)._h0;
     }
-	gdbregs.regs[32]=context->getCpuPtr()->read_pc();//10086;//pc
+	for(int i =0; i < LILY2_NS::Num_Y_Regs; i++){
+		gdbregs.regs[56+4*i]  =context->getCpuPtr()->read_y_reg(i)._h3;
+		gdbregs.regs[56+1+4*i]=context->getCpuPtr()->read_y_reg(i)._h2;
+		gdbregs.regs[56+2+4*i]=context->getCpuPtr()->read_y_reg(i)._h1;
+		gdbregs.regs[56+3+4*i]=context->getCpuPtr()->read_y_reg(i)._h0;
+	}*/
+	gdbregs.regs[57]=context->getCpuPtr()->read_pc();//pc
     //gdbregs.regs[33]=10010;//RA
 	// Y
 	//for(int i = 0; i != LILY2_NS::Num_Y_Regs; i++) {
@@ -591,15 +601,15 @@ RemoteGDB::setregs()
     // MIPS registers are 32 bits wide, gdb registers are 64 bits wide
     // two MIPS registers are packed into one gdb register (little endian)
     // X0~X23
-	for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
+	//for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
 
-		context->getCpuPtr()->write_x_reg(i,gdbregs.regs[i]);
+	//	context->getCpuPtr()->write_x_reg(i,gdbregs.regs[i]);
 		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
-	}
+//	}
     //for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
 	//	context->getCpuPtr()->write_g_reg(i,LILY2_NS::QWORD{0,0,0,8});// & 0xffffffff;//just get G regs' low 32bit data
     //}
-	context->getCpuPtr()->set_pc(gdbregs.regs[32]);//10086;//pc
+	//context->getCpuPtr()->set_pc(gdbregs.regs[32]);//pc
     //gdbregs.regs[33]=10010;
 
 	//for(int i=0;i < 24; i++){
@@ -649,9 +659,9 @@ RemoteGDB::clearSingleStep()
     DPRINTF(GDBMisc, "clearSingleStep bt_addr=%#x nt_addr=%#x\n",
             takenBkpt, notTakenBkpt);
 
-	std::cout << "clearSingleStep"<<std::endl;
-	std::cout << "takenBkpt = 0x" << std::hex <<takenBkpt << std::endl;
-	std::cout << "nottakenBkpt = 0x" << std::hex << notTakenBkpt <<std::endl;
+	//std::cout << "clearSingleStep"<<std::endl;
+	//std::cout << "takenBkpt = 0x" << std::hex <<takenBkpt << std::endl;
+	//std::cout << "nottakenBkpt = 0x" << std::hex << notTakenBkpt <<std::endl;
 	if (takenBkpt != 0)
         clearTempBreakpoint(takenBkpt);
 
@@ -660,12 +670,20 @@ RemoteGDB::clearSingleStep()
 }
 
 void
+RemoteGDB::clearsi()
+{
+	for(int i = 0;i < tempbkptNum;i++)
+		clearTempBreakpoint(tempbkpt[i]);
+
+}
+
+void
 RemoteGDB::setSingleStep()
 {
     PCState pc = context->pcState();
     PCState bpc;
     bool set_bt = false;
-	Addr tempbkpt[7];
+	//Addr tempbkpt[6];
 
     // User was stopped at pc, e.g. the instruction at pc was not
     // executed.
@@ -684,20 +702,26 @@ RemoteGDB::setSingleStep()
     notTakenBkpt = pc.nnpc();
 	cout << "pc = 0x"<< hex << context->instAddr() <<endl; 
     //printf("pc = %#x\n",context->instAddr());
-	for(int i = 0;i < 2;i++)
+	for(int i = 0;i < tempbkptNum;i++)
 	{
-	  break_iter_t t = hardBreakMap.find(context->instAddr() + 4*i);
+	  break_iter_t t = hardBreakMap.find(context->instAddr() + 2*i);
 	  if(t == hardBreakMap.end())
 	  {
-	    tempbkpt[i] = context->instAddr() + 4*i;
-	  }	
+	    tempbkpt[i] = context->instAddr() + 2*i;
+	  }
+	  else 
+	  {
+		printf("we have set breakpoint in this addr: 0x%x\n",(int)(context->instAddr() + 2*i));
+        tempbkpt[i] = 0;
+	  }
+	    
 	}
 
 	if(context->getBranchTaken() == 1) {
 		setTempBreakpoint(context->getBranchTarget() + 4);
 	}
 	else {
-		for(int j = 0;j < 2;j++)
+		for(int j = 0;j < tempbkptNum;j++)
 		{
 		  setTempBreakpoint(tempbkpt[j]);	
 		}

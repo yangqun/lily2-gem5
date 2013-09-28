@@ -188,9 +188,18 @@ Decode::decode_inst(ExtMachInst mach_inst)
 						
 						case 0x3: {
 							switch(OP_2) {
+								case 0x02: {
+									switch(OP_3){
+									    case 0x14: {return new DINTSP_M(mach_inst); }
+									    case 0x19: {return new SWAP_SP_M(mach_inst); }
+									    case 0x1a: {return new PACKEVEN_SP_M(mach_inst); } 
+									    case 0x1b: {return new PACKODD_SP_M(mach_inst); } 
+									    case 0x1c: {return new PACKEVEN_SP_M(mach_inst); } 	
+										}
+									   }
 								case 0x1f: {
 									switch(OP_3) {
-										case 0x10: { return new MOVR_M(mach_inst); }
+										case 0x09: { return new MOVR_M(mach_inst); }
 										case 0x0b: { return new SXT1_M(mach_inst); }
 										case 0x0c: { return new ZXT1_M(mach_inst); }
 										case 0x0d: { return new SXT2_M(mach_inst); }
@@ -262,8 +271,8 @@ Decode::decode_inst(ExtMachInst mach_inst)
 						
 						case 0x5: {
 							  switch(OP_2){      
-								case 0x05:{ return new QADD_SP_M(mach_inst); }
-							        case 0x06:{ return new QSUB_SP_M(mach_inst); }
+								//case 0x05:{ return new QADD_SP_D(mach_inst); }
+							        //case 0x06:{ return new QSUB_SP_D(mach_inst); }
 								case 0x07:{ return new QMPY_SP_M(mach_inst); }
 							        case 0x08:{ return new QDIV_SP_M(mach_inst); }
 								case 0x09:{ return new QMPYADD_SP_M(mach_inst); }
@@ -276,7 +285,17 @@ Decode::decode_inst(ExtMachInst mach_inst)
 							  	}
 
 							  }	 
-						case 0x6:
+						case 0x6: {
+							  switch(OP_2){
+							  	case 0x00:{ return new DPACK0_SP_M(mach_inst); }
+							  	case 0x01:{ return new DPACK1_SP_M(mach_inst); }
+								case 0x02:{ return new DPACK2_SP_M(mach_inst); }
+								case 0x03:{ return new DPACK3_SP_M(mach_inst); }
+								case 0x04:{ return new QPACKL_SP_M(mach_inst); }
+								case 0x05:{ return new QPACKH_SP_M(mach_inst); }
+							  }
+							  	
+							  }
 						case 0x7: {
 							switch(OP_2_B){
 								case 0x0 :{ return new MOVK_M(mach_inst); }
@@ -312,6 +331,7 @@ Decode::decode_inst(ExtMachInst mach_inst)
 										case 0x08: { return new BR_D(mach_inst);    }
 										case 0x0a: { return new CALLR_D(mach_inst); }
 										case 0x1e: { return new SETR_D(mach_inst);  }
+										case 0x1f: { return new SETV_D(mach_inst); }
 										
 										default:   { return new UNKNOWN(mach_inst); }
 									}
@@ -350,10 +370,19 @@ Decode::decode_inst(ExtMachInst mach_inst)
 
 							          default: { return new UNKNOWN(mach_inst); }
 							              }
-							  }	  
+							  }
+
+						case 0x5: {
+							  switch(OP_2) {
+								case 0x5: { return new QADD_SP_D(mach_inst); }
+								case 0x6: { return new QSUB_SP_D(mach_inst); }
+								default: { return new UNKNOWN(mach_inst); }
+							  }
+							  }
 						
-						default: return new UNKNOWN(mach_inst);
+							default: return new UNKNOWN(mach_inst);
 				        	}
+
 				    }
 				
 				case 0x3: {
