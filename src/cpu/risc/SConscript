@@ -63,6 +63,8 @@ if 'RiscCPU' in env['CPU_MODELS']:
     Source("isa/categories/misc.cc")
     Source("isa/categories/multiply.cc")
     Source("isa/categories/flow.cc")
+    Source("isa/categories/fp.cc")
+    Source("isa/categories/vector.cc")
 ########################################################################
 # End adding new files.
 ########################################################################

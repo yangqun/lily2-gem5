@@ -43,7 +43,7 @@
  */
 
 /**
- * Modifier: Li Xiaotian
+ * Modifier: yangqun
  * Description: MIPS===>LILY2
  *              Mips===>Lily2
  *              mips===>lily2
@@ -182,6 +182,7 @@ RemoteGDB::acc(Addr va, size_t len)
 // present, but might eventually become meaningful. (XXX) It might
 // makes sense to use POSIX errno values, because that is what the
 // gdb/remote.c functions want to return.
+#if 1
 bool
 RemoteGDB::trap(int type)
 {
@@ -196,18 +197,18 @@ RemoteGDB::trap(int type)
     bool ret;
 
     int idx;
-    uint64_t * regval;
+    uint32_t * regval;
 
     if (!attached)
         return false;
 
-    bufferSize = gdbregs.bytes() * 2 + 256;
+    bufferSize = gdbregs.bytes() * 2 + 1256;
     buffer = (char*)malloc(bufferSize);
 
     DPRINTF(GDBMisc, "trap: PC=%s\n", context->pcState());
 
     clearSingleStep();
-	clearsi();
+	//clearsi();
 
     /*
      * The first entry to this function is normally through
@@ -264,24 +265,36 @@ RemoteGDB::trap(int type)
             }
             continue;
 
-#if 0
+#if 1
           case GDBSetReg:
             val = hex2i(&p);
+			printf("val = %llx\n",val);
             if (*p++ != '=') {
                 send("E01");
                 continue;
             }
-            if (val < 0 && val >= KGDB_NUMREGS) {
+            if (val < 0 && val >= 153) {
                 send("E01");
                 continue;
             }
-
-            gdbregs.regs[val] = hex2i(&p);
+			if(val >= 0 && val < 24)
+                gdbregs.regs[val] = bswap_32(hex2i(&p));
+			else if(val >= 24 && val <56){
+				//gdbregs.regs[24+]
+				printf("%s\n",p);			
+			}
+			else if(56 == val){
+				printf("%llx\n",hex2i(&p));
+				//printf("%x\n",bswap_32(hex2i(&p)));
+				gdbregs.regs[218] = hex2i(&p);//(((hex2i(&p))&0xff000000) >> 24) | (((hex2i(&p))&0xff0000) >> 8) | (((hex2i(&p))&0xff00) << 8) | (((hex2i(&p))&0xff) << 24);
+				//gdbregs.regs[152] = ((hex2i(&p) >> 24)&0xff) | (((hex2i(&p)) >> 8)&0xff00) | (((hex2i(&p)) << 8)&0xff0000) | (((hex2i(&p)) << 24)&0xff000000);
+			}
             setregs();
             send("OK");
 
             continue;
 #endif
+
 
           case GDBMemR:  //'m' read memory
             val = hex2i(&p);
@@ -511,10 +524,16 @@ RemoteGDB::trap(int type)
     }
 
   out:
+	
+	for (break_iter_t it = hardBreakMap.begin (); 
+	     it != hardBreakMap.end (); ++it) {
+		
+		printf ("existed addr: 0x%llx\n", it->first);
+	}
     free(buffer);
     return true;
 }
-
+#endif
 
 /*
  * Translate the kernel debugger register format into the GDB register
@@ -523,70 +542,32 @@ RemoteGDB::trap(int type)
 void
 RemoteGDB::getregs()
 {
-	// X0~X23
-	for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
-		gdbregs.regs[i]=context->getCpuPtr()->read_x_reg(i);
-		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
-	}
-    /*for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
-		gdbregs.regs[24+4*i]  =context->getCpuPtr()->read_g_reg(i)._h3;
-		gdbregs.regs[24+1+4*i]=context->getCpuPtr()->read_g_reg(i)._h2;
-		gdbregs.regs[24+2+4*i]=context->getCpuPtr()->read_g_reg(i)._h1;
-		gdbregs.regs[24+3+4*i]=context->getCpuPtr()->read_g_reg(i)._h0;
-    }
-	for(int i =0; i < LILY2_NS::Num_Y_Regs; i++){
-		gdbregs.regs[56+4*i]  =context->getCpuPtr()->read_y_reg(i)._h3;
-		gdbregs.regs[56+1+4*i]=context->getCpuPtr()->read_y_reg(i)._h2;
-		gdbregs.regs[56+2+4*i]=context->getCpuPtr()->read_y_reg(i)._h1;
-		gdbregs.regs[56+3+4*i]=context->getCpuPtr()->read_y_reg(i)._h0;
-	}*/
-	gdbregs.regs[57]=context->getCpuPtr()->read_pc();//pc
-    //gdbregs.regs[33]=10010;//RA
-	// Y
-	//for(int i = 0; i != LILY2_NS::Num_Y_Regs; i++) {
-	//	tc->getCpuPtr()->get_y_regfile()->read(i);
-	//}
-	// G0~G8
-	//for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
-	//	gdbregs.regs[12+i]=context->getCpuPtr()->read_g_reg(i);
-//gdbregs.regs[12+i]=pack(context->getCpuPtr()->read_g_reg(i*2),context->getCpuPtr()->read_g_reg(i*2+1));
-//	}
-	// PC
-	//tc->getCpuPtr()->get_pcs()->get_fetch_addr();
-	/*
     DPRINTF(GDBAcc, "getregs in remotegdb \n");
-    memset(gdbregs.regs, 0, gdbregs.bytes());
+	for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
+		//gdbregs.regs[i]=context->getCpuPtr()->read_x_reg(i);
+		gdbregs.regs[4*i]  =context->getCpuPtr()->read_x_reg(i)._h0;
+		gdbregs.regs[1+4*i]=context->getCpuPtr()->read_x_reg(i)._h1;
+		gdbregs.regs[2+4*i]=context->getCpuPtr()->read_x_reg(i)._h2;
+		gdbregs.regs[3+4*i]=context->getCpuPtr()->read_x_reg(i)._h3;
 
-    // MIPS registers are 32 bits wide, gdb registers are 64 bits wide
-    // two MIPS registers are packed into one gdb register (little endian)
-
-    // INTREG: R0~R31
-    for (int i = 0; i < GdbIntArchRegs; i++) {
-        gdbregs.regs[i] = pack(
-                context->readIntReg(i * 2),
-                context->readIntReg(i * 2 + 1));
+	}
+    for(int i = 0; i != LILY2_NS::Num_G_Regs-2; i++) {
+		gdbregs.regs[96+4*i]  =context->getCpuPtr()->read_g_reg(i)._h0;
+		gdbregs.regs[96+1+4*i]=context->getCpuPtr()->read_g_reg(i)._h1;
+		gdbregs.regs[96+2+4*i]=context->getCpuPtr()->read_g_reg(i)._h2;
+		gdbregs.regs[96+3+4*i]=context->getCpuPtr()->read_g_reg(i)._h3;
     }
-    // SR, LO, HI, BADVADDR, CAUSE, PC
-    gdbregs.regs[GdbIntArchRegs + 0] = pack(
-                context->readMiscRegNoEffect(MISCREG_STATUS),
-                context->readIntReg(INTREG_LO));
-    gdbregs.regs[GdbIntArchRegs + 1] = pack(
-                context->readIntReg(INTREG_HI),
-                context->readMiscRegNoEffect(MISCREG_BADVADDR));
-    gdbregs.regs[GdbIntArchRegs + 2] = pack(
-                context->readMiscRegNoEffect(MISCREG_CAUSE),
-                context->pcState().pc());
-    // FLOATREG: F0~F31
-    for (int i = 0; i < GdbFloatArchRegs; i++) {
-        gdbregs.regs[GdbIntRegs + i] = pack(
-                context->readFloatRegBits(i * 2),
-                context->readFloatRegBits(i * 2 + 1));
-    }
-    // FCR, FIR
-    gdbregs.regs[GdbIntRegs + GdbFloatArchRegs + 0] = pack(
-                context->readFloatRegBits(FLOATREG_FCCR),
-                context->readFloatRegBits(FLOATREG_FIR));
-	*/
+	gdbregs.regs[120] = context->getCpuPtr()->read_g_reg(6)._h0;//FP
+	gdbregs.regs[121] = context->getCpuPtr()->read_g_reg(7)._h0;//SP
+	for(int i =0; i < LILY2_NS::Num_Y_Regs; i++){
+		gdbregs.regs[122+4*i]  =context->getCpuPtr()->read_y_reg(i)._h0;
+		gdbregs.regs[122+1+4*i]=context->getCpuPtr()->read_y_reg(i)._h1;
+		gdbregs.regs[122+2+4*i]=context->getCpuPtr()->read_y_reg(i)._h2;
+		gdbregs.regs[122+3+4*i]=context->getCpuPtr()->read_y_reg(i)._h3;
+	}
+	gdbregs.regs[218]=context->getCpuPtr()->read_pc();//pc
+    //DPRINTF(GDBAcc, "getregs in remotegdb \n");
+   // memset(gdbregs.regs, 0, gdbregs.bytes());
 }
 
 /*
@@ -596,27 +577,44 @@ RemoteGDB::getregs()
 void
 RemoteGDB::setregs()
 {
+	//now I only support to modify X regs' value.
+
     DPRINTF(GDBAcc, "setregs in remotegdb \n");
+	LILY2_NS::QWORD temp;
+	int i;
+	for(i = 0;i < LILY2_NS::Num_X_Regs;i++)
+		//context->getCpuPtr()->write_x_reg(i,gdbregs.regs[i]);
+		temp._h0 = gdbregs.regs[4*i];
+		temp._h1 = gdbregs.regs[4*i+1];
+		temp._h2 = gdbregs.regs[4*i+2];
+		temp._h3 = gdbregs.regs[4*i+3];
+		context->getCpuPtr()->write_x_reg(i,temp);
+
+	for(i = 0; i != LILY2_NS::Num_G_Regs; i++) {
+		temp._h0 = gdbregs.regs[24+4*i];
+		temp._h1 = gdbregs.regs[24+4*i+1];
+		temp._h2 = gdbregs.regs[24+4*i+2];
+		temp._h3 = gdbregs.regs[24+4*i+3];
+		context->getCpuPtr()->write_g_reg(i,temp);
+    }
+	for(i = 0; i < LILY2_NS::Num_Y_Regs; i++){
+		temp._h0 = gdbregs.regs[56+4*i];
+		temp._h1 = gdbregs.regs[56+4*i+1];
+		temp._h2 = gdbregs.regs[56+4*i+2];
+		temp._h3 = gdbregs.regs[56+4*i+3];
+		context->getCpuPtr()->write_y_reg(i,temp);
+	}
+	//	temp._h0 = 0x11;
+	//	temp._h1 = 0x22;
+	//	temp._h2 = 0x33;
+	//	temp._h3 = 0x44;
+	//	context->getCpuPtr()->write_y_reg(1,temp);
+
+	//context->getCpuPtr()->set_pc(0x100008c);//(gdbregs.regs[152]);//pc
+	//printf("setregs\n");
 
     // MIPS registers are 32 bits wide, gdb registers are 64 bits wide
     // two MIPS registers are packed into one gdb register (little endian)
-    // X0~X23
-	//for(int i = 0; i < LILY2_NS::Num_X_Regs; i++) { //LILY2_NS::Num_X_Regs
-
-	//	context->getCpuPtr()->write_x_reg(i,gdbregs.regs[i]);
-		//gdbregs.regs[LILY2_NS::Num_X_Regs]=pack(context->getCpuPtr()->read_x_reg(i*2),context->getCpuPtr()->read_x_reg(i*2+1));
-//	}
-    //for(int i = 0; i != LILY2_NS::Num_G_Regs; i++) {
-	//	context->getCpuPtr()->write_g_reg(i,LILY2_NS::QWORD{0,0,0,8});// & 0xffffffff;//just get G regs' low 32bit data
-    //}
-	//context->getCpuPtr()->set_pc(gdbregs.regs[32]);//pc
-    //gdbregs.regs[33]=10010;
-
-	//for(int i=0;i < 24; i++){
-	//	context->setIntReg(i, 2);		
-			
-//	}
-
 
     // INTREG: R0~R31
     /*for (int i = 0; i < GdbIntArchRegs; i++) {
@@ -667,6 +665,9 @@ RemoteGDB::clearSingleStep()
 
     if (notTakenBkpt != 0)
         clearTempBreakpoint(notTakenBkpt);
+
+	for(int i = 0;i < tempbkptNum;i++)
+		clearTempBreakpoint(tempbkpt[i]);
 }
 
 void
@@ -700,14 +701,15 @@ RemoteGDB::setSingleStep()
             takenBkpt, notTakenBkpt);
 
     notTakenBkpt = pc.nnpc();
-	cout << "pc = 0x"<< hex << context->instAddr() <<endl; 
+	cout << "pc = 0x"<< hex << context->getCpuPtr()->read_pc() <<endl; 
     //printf("pc = %#x\n",context->instAddr());
 	for(int i = 0;i < tempbkptNum;i++)
 	{
 	  break_iter_t t = hardBreakMap.find(context->instAddr() + 2*i);
 	  if(t == hardBreakMap.end())
 	  {
-	    tempbkpt[i] = context->instAddr() + 2*i;
+	    //tempbkpt[i] = context->instAddr() + 2*i;
+		tempbkpt[i] = context->getCpuPtr()->read_pc() + 2*i;
 	  }
 	  else 
 	  {

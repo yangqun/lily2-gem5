@@ -397,9 +397,14 @@ class BaseCPU : public MemObject
         return total;
     }
 
-	virtual LILY2_NS::WORD read_x_reg(int i)
+	virtual LILY2_NS::QWORD read_x_reg(int i)
 	{
-		return 0;
+		LILY2_NS::QWORD val;
+		val._h0 = 0;
+		val._h1 = 0;
+		val._h2 = 0;
+		val._h3 = 0;
+		return val;
 	}
 
 	virtual LILY2_NS::QWORD read_y_reg(int i)
@@ -422,7 +427,7 @@ class BaseCPU : public MemObject
 		return val;
 	}
 
-	virtual void write_x_reg(int i, LILY2_NS::WORD val)
+	virtual void write_x_reg(int i, LILY2_NS::QWORD val)
 	{
 		;
 	}

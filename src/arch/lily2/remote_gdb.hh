@@ -29,7 +29,7 @@
  */
 
 /**
- * Modifier: Li Xiaotian
+ * Modifier: yangqun
  * Description: MIPS===>LILY2
  *              Mips===>Lily2
  *              mips===>lily2
@@ -59,7 +59,7 @@ namespace Lily2ISA
     const int GdbFloatRegs = GdbFloatArchRegs + GdbFloatSpecialRegs;
     const int GdbNumRegs = GdbIntRegs + GdbFloatRegs;
     */
-	const int GdbNumRegs = 58;//X G Y PC
+	const int GdbNumRegs = 219;//X G Y PC
 	const int tempbkptNum = 12 ;//insert 12 temp breakpoints,for GDB si
 
     class RemoteGDB : public BaseRemoteGDB

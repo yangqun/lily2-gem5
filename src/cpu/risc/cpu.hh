@@ -187,7 +187,7 @@ public:
     typedef LILY2_NS::Execute Execute;
 
     typedef LILY2_NS::RetStack RetStack;
-    typedef LILY2_NS::WRegFile<LILY2_NS::Num_X_Regs> XRegFile;
+    typedef LILY2_NS::QWRegFile<LILY2_NS::Num_X_Regs> XRegFile;
     typedef LILY2_NS::QWRegFile<LILY2_NS::Num_Y_Regs> YRegFile;
     typedef LILY2_NS::QWRegFile<LILY2_NS::Num_G_Regs> GRegFile;
     typedef LILY2_NS::WRegFile<LILY2_NS::Num_C_Regs> CRegFile;
@@ -218,7 +218,8 @@ private:
     /* Return address stack. */
     RetStack *__ret_stack;
 
-private:
+    int cnt;
+public:
     enum Mode {
         RISC,
         VLIW
@@ -241,6 +242,16 @@ private:
 	Tick __cycle;
 
 public:
+	Mode getMode (void) const
+	{
+		return __mode;
+	}
+
+	void setMode (Mode mode)
+	{
+		__mode = mode;
+	}
+
     /**
      * List of the interfaces of modules.
      */
@@ -318,7 +329,7 @@ public:
     void set_return_target(Addr return_target);
     Addr get_return_target(void);
 
-	virtual WORD read_x_reg(int i)
+	virtual QWORD read_x_reg(int i)
 	{
 		return __x_regfile->read(i);
 	}
@@ -333,7 +344,7 @@ public:
 		return __g_regfile->read(i);
 	}
 
-	virtual void write_x_reg(int i, WORD val)
+	virtual void write_x_reg(int i, QWORD val)
 	{
 		__x_regfile->write(i, val);
 	}

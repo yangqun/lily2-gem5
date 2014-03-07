@@ -2721,6 +2721,145 @@ LOG_DP_M::generate_disassembly() const
 	return ss.str();
 }
 
+/* *********************************************************************
+ * ***************************** NEG_SP_M ******************************
+ * ********************************************************************/	
+NEG_SP_M::NEG_SP_M(ExtMachInst mach_inst)
+    : StaticInst("NEG_SP_M", mach_inst)
+{
+	/* Flags. */
+	_flags[Is_32_Bit ]  = true;
+	_flags[Is_Cond   ]  = true;
+
+	
+	/* Unit. */
+	/* Parameters: A/M/D. */
+	init_unit(M);
+	
+	/* Immediate. */
+	/* Parameters: imm, imm_len. */
+	
+	/* Registers. */
+	/* Parameters: num_src_regs, num_dst_regs, ... */
+	init_src_regs(1, REG, RS_1_A);
+	init_dst_regs(1, REG, RD_A, 0);
+}
+
+void
+NEG_SP_M::execute(RiscCPU *cpu) const
+{
+	if(cond_execute(cpu)) {
+		/* Reading registers. */
+		SP op = cpu->read_src_sp_operand(this, 0);
+		
+		/* Execution. */
+		SP final = neg(op);
+		
+		/* Writing registers. */
+		cpu->cache_dst_sp_operand(this, 0, final);
+	}
+	else {
+		_d_ptr->set_op2nop();
+	}
+}
+
+std::string
+NEG_SP_M::generate_disassembly() const
+{
+	std::stringstream ss;
+	
+	/* Output condition. */
+	print_cond(ss);
+	
+	/* Output instruction mnemonic. */
+	print_mnemonic(ss);
+	
+	/* Output instruction length. */
+	print_len(ss);
+	
+	/* Output insruction unit. */
+	print_unit(ss);
+	
+	/* Output destination registers. */
+	print_dst_reg(ss);
+	
+	/* Output source registers. */
+	print_src_reg(ss);
+	
+	/* Output the immediate. */
+	
+	return ss.str();
+}
+
+/* *********************************************************************
+ * ***************************** NEG_DP_M ******************************
+ * ********************************************************************/
+NEG_DP_M::NEG_DP_M(ExtMachInst mach_inst)
+    : StaticInst("NEG_DP_M", mach_inst)
+{
+	/* Flags. */
+	_flags[Is_32_Bit ]  = true;
+	_flags[Is_Cond   ]  = true;
+
+	
+	/* Unit. */
+	/* Parameters: A/M/D. */
+	init_unit(M);
+	
+	/* Immediate. */
+	/* Parameters: imm, imm_len. */
+	
+	/* Registers. */
+	/* Parameters: num_src_regs, num_dst_regs, ... */
+	init_src_regs(1, REG, RS_1_A);
+	init_dst_regs(1, REG, RD_A, 0);
+}
+
+void
+NEG_DP_M::execute(RiscCPU *cpu) const
+{
+	if(cond_execute(cpu)) {
+		/* Reading registers. */
+		DP op = cpu->read_src_dp_operand(this, 0);
+		
+		/* Execution. */
+		DP final = neg(op);
+		
+		/* Writing registers. */
+		cpu->cache_dst_dp_operand(this, 0, final);
+	}
+	else {
+		_d_ptr->set_op2nop();
+	}
+}
+
+std::string
+NEG_DP_M::generate_disassembly() const
+{
+	std::stringstream ss;
+	
+	/* Output condition. */
+	print_cond(ss);
+	
+	/* Output instruction mnemonic. */
+	print_mnemonic(ss);
+	
+	/* Output instruction length. */
+	print_len(ss);
+	
+	/* Output insruction unit. */
+	print_unit(ss);
+	
+	/* Output destination registers. */
+	print_dst_reg(ss);
+	
+	/* Output source registers. */
+	print_src_reg(ss);
+	
+	/* Output the immediate. */
+	
+	return ss.str();
+}
 //
 ///* *********************************************************************
 // * *************************** SPINT_W_M *******************************

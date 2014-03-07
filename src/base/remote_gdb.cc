@@ -143,6 +143,7 @@ using namespace std;
 using namespace Debug;
 using namespace TheISA;
 
+//#define bswap_32(x) ( (((x)&0xff)<<24) | (((x)&0xff00)<<8) | (((x)&0xff0000)>>8) | (((x)&0xff000000)>>24) )
 #ifndef NDEBUG
 vector<BaseRemoteGDB *> debuggers;
 
@@ -424,7 +425,6 @@ BaseRemoteGDB::recv(char *bp, int maxlen)
             *p++ = c;
             len++;
         }
-//		std::cout << std::endl;
 	    std::cout<<"#"<<(i2digit(csum>>4));
 		std::cout<<(i2digit(csum))<<std::endl;
 
@@ -579,7 +579,7 @@ BaseRemoteGDB::insertHardBreak(Addr addr, size_t len)
         panic("invalid length\n");
 
     DPRINTF(GDBMisc, "inserting hardware breakpoint at %#x\n", addr);
-
+    printf("inserting bkpt@0x%llx\n",addr);
     HardBreakpoint *&bkpt = hardBreakMap[addr];
 	//printf("bkpt = ");
     if (bkpt == 0)
@@ -598,7 +598,7 @@ BaseRemoteGDB::removeHardBreak(Addr addr, size_t len)
         panic("invalid length\n");
 
     DPRINTF(GDBMisc, "removing hardware breakpoint at %#x\n", addr);
-
+	cout << "removing bkpt@0x" << hex << addr << endl;
     break_iter_t i = hardBreakMap.find(addr);
     if (i == hardBreakMap.end())
         return false;
@@ -608,8 +608,7 @@ BaseRemoteGDB::removeHardBreak(Addr addr, size_t len)
         delete hbp;
         hardBreakMap.erase(i);
     }
-	cout << "removing bkpt@0x" << hex << addr << endl;
-    return true;
+	    return true;
 }
 
 void
@@ -645,6 +644,7 @@ BaseRemoteGDB::break_type(char c)
 // present, but might eventually become meaningful. (XXX) It might
 // makes sense to use POSIX errno values, because that is what the
 // gdb/remote.c functions want to return.
+#if 1
 bool
 BaseRemoteGDB::trap(int type)
 {
@@ -705,7 +705,7 @@ BaseRemoteGDB::trap(int type)
             send(buffer);
             continue;
 
-          case GDBRegR:
+          case GDBRegR:  //'g'
             if (2 * gdbregs.bytes() > bufferSize)
                 panic("buffer too small");
 
@@ -713,7 +713,7 @@ BaseRemoteGDB::trap(int type)
             send(buffer);
             continue;
 
-          case GDBRegW:
+          case GDBRegW:   //'G'
             p = hex2mem(gdbregs.regs, p, gdbregs.bytes());
             if (p == NULL || *p != '\0')
                 send("E01");
@@ -723,26 +723,37 @@ BaseRemoteGDB::trap(int type)
             }
             continue;
 
-#if 0
+#if 1
           case GDBSetReg:
             val = hex2i(&p);
             if (*p++ != '=') {
                 send("E01");
                 continue;
             }
-            if (val < 0 && val >= KGDB_NUMREGS) {
+            if (val < 0 && val >= 153) {
                 send("E01");
                 continue;
             }
-
-            gdbregs.regs[val] = hex2i(&p);
+			if(val >= 0 && val < 24)
+                gdbregs.regs[val] = bswap_32(hex2i(&p));
+			else if(val >= 24 && val <56){
+				//gdbregs.regs[24+]
+				printf("%s\n",p);			
+			}
+			else if(56 == val){
+				printf("%llx\n",hex2i(&p));
+				//printf("%x\n",bswap_32(hex2i(&p)));
+				gdbregs.regs[152] = hex2i(&p);//(((hex2i(&p))&0xff000000) >> 24) | (((hex2i(&p))&0xff0000) >> 8) | (((hex2i(&p))&0xff00) << 8) | (((hex2i(&p))&0xff) << 24);
+				//gdbregs.regs[152] = ((hex2i(&p) >> 24)&0xff) | (((hex2i(&p)) >> 8)&0xff00) | (((hex2i(&p)) << 8)&0xff0000) | (((hex2i(&p)) << 24)&0xff000000);
+			}
             setregs();
             send("OK");
 
             continue;
 #endif
 
-          case GDBMemR:
+
+          case GDBMemR:  //'m' read memory
             val = hex2i(&p);
             if (*p++ != ',') {
                 send("E02");
@@ -813,8 +824,8 @@ BaseRemoteGDB::trap(int type)
                 send("E01");
             continue;
 
-          case GDBDetach:
-          case GDBKill:
+          case GDBDetach:  //D
+          case GDBKill:    //k
             active = false;
             clearSingleStep();
             detach();
@@ -837,7 +848,7 @@ BaseRemoteGDB::trap(int type)
             clearSingleStep();
             goto out;
 
-          case GDBAsyncStep:
+          case GDBAsyncStep:   //S04#b7  si
             subcmd = hex2i(&p);
             if (*p++ == ';') {
                 val = hex2i(&p);
@@ -892,7 +903,7 @@ BaseRemoteGDB::trap(int type)
             val = hex2i(&p);
             if (*p++ != ',') send("E0D");
             len = hex2i(&p);
-
+            //printf("Address is: %x, length is:%d\n",val,len);
             DPRINTF(GDBMisc, "set %s, addr=%#x, len=%d\n",
                     break_type(subcmd), val, len);
 
@@ -959,7 +970,7 @@ BaseRemoteGDB::trap(int type)
     free(buffer);
     return true;
 }
-
+#endif
 // Convert a hex digit into an integer.
 // This returns -1 if the argument passed is no valid hex digit.
 int

@@ -33,6 +33,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <cstdio>
 
 #include "base/debug.hh"
 #include "base/trace.hh"
@@ -91,6 +92,7 @@ PCEventQueue::doService(ThreadContext *tc)
     // This will fail to break on Alpha PALcode addresses, but that is
     // a rare use case.
     Addr pc = tc->instAddr();
+	printf ("~~~~~~~~~~~~~~~~~~~~~~ 0x%llx ~~~~~~~~~~~~~~~~~~~~~~\n", pc);
     int serviced = 0;
     range_t range = equal_range(pc);
     for (iterator i = range.first; i != range.second; ++i) {
@@ -100,6 +102,10 @@ PCEventQueue::doService(ThreadContext *tc)
         // event queues for each processor?
         if (pc != tc->instAddr())
             continue;
+	
+		std::cout <<"PC based event serviced at " << (*i)->pc() << ": " << (*i)->descr() << std::endl;
+
+	
 
         DPRINTF(PCEvent, "PC based event serviced at %#x: %s\n",
                 (*i)->pc(), (*i)->descr());

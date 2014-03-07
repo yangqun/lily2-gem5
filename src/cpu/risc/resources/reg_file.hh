@@ -373,14 +373,10 @@ public:
 public:
     void __DEBUG(void)
     {
-		FON(i,0,N,4) {
-			DPF("[G%02d] = 0x%08x  ", i+0, _reg[i+0]._h0);
-			DPF("[G%02d] = 0x%08x  ", i+1, _reg[i+1]._h0);
-			DPF("[G%02d] = 0x%08x  ", i+2, _reg[i+2]._h0);
-			DPF("[G%02d] = 0x%08x  ", i+3, _reg[i+3]._h0);
-			DPF("\n");
+		FOR(i,0,N) {
+			DPF("[%02d] = 0x%08x, %08x, %08x, %08x\n", i, _reg[i]._h3, _reg[i]._h2, _reg[i]._h1, _reg[i]._h0);
 		}
-	}
+    }
 };
 
 template <int N>
@@ -403,7 +399,8 @@ typename QWRegFile<N>::RegWidth
 QWRegFile<N>::read(RegIndex reg_idx)
 {
 	/* Index range checking. */
-	AST(reg_idx>=0 && reg_idx<N);
+	ASSERT_GTE(reg_idx, 0);
+	ASSERT_LT(reg_idx, N);
 	
 	return _reg[reg_idx];
 }

@@ -138,18 +138,18 @@ class BaseRemoteGDB
   protected:
     class GdbRegCache
     {
-      public:
-        GdbRegCache(size_t newSize) : regs(new uint64_t[newSize]), size(newSize)
+      public:       //uint64_t
+        GdbRegCache(uint32_t newSize) : regs(new uint32_t[newSize]), size(newSize)
         {}
         ~GdbRegCache()
         {
             delete [] regs;
         }
 
-        uint64_t * regs;
-        size_t size;
-        size_t bytes() { return size * sizeof(uint64_t); }
-    };
+        uint32_t * regs;//uint64_t
+        uint32_t size;  //size_t
+        uint32_t bytes() { return size * sizeof(uint32_t); }
+    };  //size_t
 
     GdbRegCache gdbregs;
 
@@ -179,7 +179,7 @@ class BaseRemoteGDB
     bool isattached();
 
     virtual bool acc(Addr addr, size_t len) = 0;
-    bool trap(int type);
+    virtual bool trap(int type);
     virtual bool breakpoint()
     {
         return trap(SIGTRAP);

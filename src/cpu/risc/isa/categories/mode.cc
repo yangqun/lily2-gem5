@@ -43,7 +43,7 @@ SETR_D::SETR_D(ExtMachInst mach_inst)
 void
 SETR_D::execute(RiscCPU *cpu) const
 {
-
+	cpu->setMode (RiscCPU::RISC);
 }
 
 std::string
@@ -80,7 +80,7 @@ SETV_D::SETV_D(ExtMachInst mach_inst)
 void
 SETV_D::execute(RiscCPU *cpu) const
 {
-
+	cpu->setMode (RiscCPU::VLIW);
 }
 
 std::string
